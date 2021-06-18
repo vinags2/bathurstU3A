@@ -1,0 +1,43 @@
+TODO:
+
+Quick items to remember
+
+Edit Member Page:
+General
+- Make a Sticky Footer which is at the bottom of the page, unless there is more than one page of data,
+    in which case the footer will be at the bottom of the text.
+- make a scope for sessions not deleted or suspended
+- make a scope for all models 'where not deleted' and make that the default search
+- cut the number of database accesses in the individual member report, the class rolls report, and others
+- in the url .../person/show/144 show the member details for member with id 144
+- move the 'search' route to api.php, after working out how to authorize the api call
+- trim spaces from names and other text entries before saving
+- create a committee table to record who is on the committee, when, and in what position
+Courses:
+- add a cost field to cover extra costs for the course (either per class, or a one off) eg to pay for materials, or like D2F to use their facilities
+
+Migrations
+- add a virtual column any_phone to the people table with expression:
+    if(`phone` = '' or `phone` is null,`mobile`,`phone`)
+- delete duplicate rows in session_attendance_histories
+- add a 'deleted_at' (TIMESTAMP, default NULL) to the venues table
+- remove the menu items:
+    - members details (PDF) (report_id = 51)
+    - facilitators (12)
+    - members? (15)
+- delete all tables relating to reports and menus
+- make the size of model_id and email varchar(100) in the tables
+- create the levenshtein function (see the SQl in 'create DB statements' directory)
+        (or maybe not -- depends on whether it is used in my search functions)
+- check how soft deletes works. Do I have to update the 'deleted_at' column from the 'deleted' column before putting
+        the application into production?
+- make preferred_name in people nullable.
+- change default value for 'committee_member' in people table to 0
+- add a unique index for last_name, first_name on people and drop the people_last_name_index
+- set config('myconfig.currentYear') to 2020 (or whatever the current year is)
+- set created_at columns to now()
+- add a payment_received (bool, default = false, not null) column in the membership histories table.
+- fill all existing payment_received with true.
+- add updated_by to membership_histories
+- add paid column (0 = not paid, 1 = cash, 2 = cheque, 3 = credit card, 4 = direct deposit, 5 = honourary)
+- when hitting return at 'select member to edit (memberships/contact details)', then select the first option in the drop-down list

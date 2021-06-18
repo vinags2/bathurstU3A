@@ -1,0 +1,31 @@
+1. export the data from v1 using phpmyadmin using 'custom' and firstly choosing only data, and secondly running it again choosing structure only.
+2. run v1Tov21.sh
+3. import the data using either phpmyadmin or mysqlworkbench, selecting the right database first.
+
+Importing the data
+- as above first
+- Add a created_at and updated_at column to all tables
+- PHP artisan make:model Persons -m etc for all tables
+- Set default values in the model eg protected $attributes = [ ‘postcode’ => ‘2795’];
+- Set $fillable or $guarded in each model. 
+- Change deleted column to deleted_at
+- In membership_histories, change join date to date_of_admission
+- In membership_histories, add a date_of_withdrawal column with default NULL
+- In session_attendee, add date_of_withdrawal [date], year [year(4)] and term [smallint(3) default 0] columns
+- Create indexes on year, etc.
+- create sessions.name unique index
+- create courses.name unique index
+- set year to current year for all records in session_attendees  [update session_attendee set `year` = year(curdate())]
+- set term to 0 where null in session_attendee
+- remove all spaces from mobile and phone columns of people
+- trim spaces from names in people
+- import records from session_attendance_histories into session_attendees (see sql script under u3a administrator directory)
+- delete session_attendance_histories
+ 
+Migration of local bathurst U3A DB v2 to bathurstu3a.com
+
+- [ ] Synchronise the files in Laravel/bathurstU3A21 and Sites/bathurstU3A21
+- [ ] Run ‘php artisan migrate’ on the remote server
+- remove the '-1' from the myconfig.php config file in config, and run php artisan config:cache
+- run php artisan route:clear and php artisan config:clear
+
