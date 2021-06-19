@@ -9,6 +9,7 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+todo.txt
 
 # from https://medium.com/@technobollox/a-good-start-on-a-laravel-gitignore-file-6c4656aec2d
 # ignore log files and databases
