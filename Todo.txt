@@ -41,3 +41,4 @@ Migrations
 - add updated_by to membership_histories
 - add paid column (0 = not paid, 1 = cash, 2 = cheque, 3 = credit card, 4 = direct deposit, 5 = honourary)
 - when hitting return at 'select member to edit (memberships/contact details)', then select the first option in the drop-down list
+- test
