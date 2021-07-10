@@ -47,7 +47,7 @@ class MenuRepository extends Controller
                 46 => [4,5,16,17],               // Newsletters Menu
                 47 => [20, 18, 21],              // Forms Menu
                 48 => [55, 38, 40, 58, 60],              // Utilities Menu
-                49 => [59,61,29,30,31, 33, 36]      // Data Entry Menu
+                49 => [59,62,61,29,30,31, 33, 36]      // Data Entry Menu
                 // 49 => [59,29,30,31, 33, 36]      // Data Entry Menu
                 ];
                 break;
@@ -386,6 +386,13 @@ class MenuRepository extends Controller
                     'text' => 'Contact details',
                     'type' => 'route',
                     'href' => 'person.editContactDetails'
+                ];
+                break;
+            case 62:
+                return [
+                    'text' => 'Membership Fees',
+                    'type' => 'report',
+                    'href' => '29'
                 ];
                 break;
             default:
