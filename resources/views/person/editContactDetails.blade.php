@@ -7,22 +7,7 @@
 
     <div class="container">
         @include('partials.commonUI.pageHeading', ['pageHeading' => 'Edit Contact Details'])
-        @if (session('success'))
-            <div class="container">
-                <table class="table-sm alert-success ml-5"><tr><td>
-                    {{ session('success') }}
-                </td></tr><tr><td></td></tr></table>
-            </div>
-        @elseif ($errors->any())
-            <div class="container">
-                <table class="table-sm alert-danger ml-5"><tr><td>
-                    Please fix the errors below...
-                </td></tr><tr><td></td>></tr></table>
-                @foreach ($errors->all() as $error)
-                    {{ $error }}<br/>
-                @endforeach
-            </div>
-        @endif
+        @include('partials.commonUI.showSuccessOrErrors')
         @if (!$showDetails)
             @include('partials.search.person')
         @else

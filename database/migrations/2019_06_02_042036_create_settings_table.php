@@ -43,6 +43,12 @@ class CreateSettingsTable extends Migration
                 ->default(4);
             $table->string('email_of_dbadmin')
                 ->nullable();
+            $table->date('rejoin_start_date')
+                ->nullable();
+            $table->unsignedBigInteger('updated_by')
+                ->nullable()
+                ->comment('pointer to person table id');
+            $table->timestamps();
         });
     }
 

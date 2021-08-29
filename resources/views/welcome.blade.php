@@ -11,6 +11,7 @@
             </div>
         </div>
         @include('partials.commonUI.pageHeading', ['pageHeading' => 'About the Bathurst U3A Database'])
+        @include('partials.commonUI.showSuccessOrErrors')
         <div class="row">
             <div>
                 <p>The Bathurst U3A Database was created in 2017. The objective was to make the club's data

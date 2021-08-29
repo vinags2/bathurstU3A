@@ -34,17 +34,19 @@ Route::view('/member/{id}', 'reports.memberDetails') ->middleware('verified') ->
 
 // Route for generating PDFs
 Route::get('/report/pdf/{id}', 'ReportController@index') ->middleware('verified') ->name('pdf');
+Route::get('/report/pdf/show/{id}', 'GenericPdfReportController@show');
 
 // Route for generating CSVs
 Route::get('/report/csv/{id}', 'ReportController@index') ->middleware('verified') ->name('csv');
 
-Route::get('/report/pdf/show/{id}', 'GenericPdfReportController@show');
-
 // Routes for data entry
-
 Route::get('person/edit/{id?}', 'PersonController@edit') -> middleware('verified')->name('person.edit');
 Route::get('person/editContactDetails/{id?}', 'PersonController@editContactDetails') -> middleware('verified')->name('person.editContactDetails');
 Route::resource('person', 'PersonController') -> except(['edit']) -> middleware('verified');
+Route::get('settings', 'SettingController@edit') -> middleware('verified')->name('settings');
+Route::resource('setting', 'SettingController') -> except(['edit']) -> middleware('verified');
+Route::get('termDates/{id?}', 'TermDatesController@edit') -> middleware('verified')->name('termDates');
+Route::post('termDates/{id?}', 'TermDatesController@store') -> middleware('verified')->name('storeTermDates');
 
 // Routes for AJAX calls from logged in user.
 Route::get('/namesearch','PersonController@search') ->middleware('verified')->name('namesearch');
