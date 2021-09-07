@@ -68,5 +68,8 @@ class ViewServiceProvider extends ServiceProvider
         View::composer(
             'editTermDates', 'App\Http\View\Composers\EditTermDatesComposer'
         );
+        View::composer(
+            'editCourses', 'App\Http\View\Composers\EditCoursesComposer'
+        );
     }
 }

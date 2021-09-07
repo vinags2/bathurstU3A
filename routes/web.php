@@ -41,8 +41,10 @@ Route::get('/report/csv/{id}', 'ReportController@index') ->middleware('verified'
 
 // Routes for data entry
 Route::get('person/edit/{id?}', 'PersonController@edit') -> middleware('verified')->name('person.edit');
-Route::get('person/editContactDetails/{id?}', 'PersonController@editContactDetails') -> middleware('verified')->name('person.editContactDetails');
 Route::resource('person', 'PersonController') -> except(['edit']) -> middleware('verified');
+Route::get('course/edit/{id?}', 'CourseController@edit') -> middleware('verified')->name('course.edit');
+Route::resource('course', 'CourseController') -> except(['edit']) -> middleware('verified');
+Route::get('person/editContactDetails/{id?}', 'PersonController@editContactDetails') -> middleware('verified')->name('person.editContactDetails');
 Route::get('settings', 'SettingController@edit') -> middleware('verified')->name('settings');
 Route::resource('setting', 'SettingController') -> except(['edit']) -> middleware('verified');
 Route::get('termDates/{id?}', 'TermDatesController@edit') -> middleware('verified')->name('termDates');
