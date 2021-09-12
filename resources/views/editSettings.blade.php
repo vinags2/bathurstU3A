@@ -19,7 +19,7 @@
                 <tr>
                     <td><label class="col-xs-3 col-form-label mr-2" for="rejoinStartDate">Memberships for next year begin:</label></td>
                     <td>
-                        <input type="date" size="40" id="rejoinStartDate" class="form-control @error('rejoin_start_date') is-invalid @enderror" 
+                        <input type="date" size="20" id="rejoinStartDate" class="form-control @error('rejoin_start_date') is-invalid @enderror" 
                             name="rejoin_start_date" value="{{ old('rejoin_start_date',date('Y-m-d', strtotime($settings['rejoin_start_date']))) }}"
                         />
                         @error('rejoin_start_date')

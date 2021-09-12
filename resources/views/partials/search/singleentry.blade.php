@@ -6,8 +6,8 @@
     - $paramKey -- the name of the parameter to pass in the url to the API [optional; default = 'name']
     - $allowNewModel -- boolean as to whether the user to pick a new model which doesn't exist in the database [optional; default = false]
 -->
-        <table id="findMatches">
-            <form action="" autocomplete="off" method="GET">
+    <form id="findMatches" v-bind:action="href" autocomplete="off" method="GET">
+        <table>
             <tr><td></td></tr>
             <tr>
                 <td><label class="col-xs-3 col-form-label mr-2" for="first_name_input">@{{config}}:</label></td>
@@ -38,20 +38,20 @@
             <tr>
                 <td></td>
                     <td v-if="showNewButton">
-                        <button type="submit" id="newMember" name="newMember" value="1" class="btn btn-primary btn-sm">New @{{config}}</button>
+                        <button type="submit" id="newModel" name="newModel" value="1" class="btn btn-primary btn-sm">New @{{config}}</button>
+                        <input type="hidden" id="state" value="{{ $state }}" name="state" />
                     </td>
             </tr>
             <tr><td>&nbsp;</td></tr>
-            <input type="hidden" id="state" value="{{ $state }}" name="state" />
-           </form>
         </table>
+    </form>
 
         <script>
             var app = new Vue({
             el: '#findMatches',
             data: {
                 config: '{{ $model }}',
-                axiosUrl: '{{ $url }}',
+                axiosUrl: '{{ $searchUrl }}',
                 axiosParamKey: '{{ $paramKey ?? name }}',
                 allowNew: '{{ $allowNewModel ?? false }}', // allow New Courses
 
@@ -62,7 +62,8 @@
                 showPrompt: true,
                 showMatches: false,
                 showNewButton: false,
-                clear: false
+                clear: false,
+                href: window.location.href
             },
             computed: {
                 axiosParams() {

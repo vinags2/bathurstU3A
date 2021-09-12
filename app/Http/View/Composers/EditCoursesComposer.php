@@ -34,9 +34,10 @@ class EditCoursesComposer
      * Otherwise, set the courseId to -1.
      */
     private function saveCourseId() {
-        if (session('courseId')) {
-            request()->merge(['courseId'=>session('courseId')]);
+        if (session('findMatches')) {
+            request()->merge(['courseId'=>session('findMatches')]);
         }
+        $this->courseId = request()->get('findMatches',-1);
     }
 
     /**
@@ -66,10 +67,10 @@ class EditCoursesComposer
      * Used in edit.blade.php (as well as here)
      */
      private function getState() {
-         if (request()->filled('courseId') && $this->isValidCourseId()) {
+         if (request()->filled('findMatches') && $this->isValidCourseId()) {
              return 'update existing course';
          }
-         if (request()->filled('newCourse')) {
+         if (request()->filled('newModel')) {
              return 'new course';
          }
          return 'course search';
@@ -111,19 +112,32 @@ class EditCoursesComposer
     }
 
     /**
+     * get the effective_from
+     * 
+     * if today is the last term of the year, set to 'nextYear', 
+     * if before the start of the first term, set to 'immediately',
+     * otherwise set to 'nextTerm'
+     */
+    private function getEffectiveFrom() {
+        return 'nextTerm';
+    }
+
+    /**
      * Open the View with the appropriate data passed
      */
     public function compose(View $view) {
         $view->with([
             'course'                        => $this->course,
-            'effective_from'                => $this->getEffectiveFromDate(),
+            'effectiveFromDate'             => $this->getEffectiveFromDate(),
             'showDetails'                   => ($this->course->name != ""),
             'state'                         => $this->state,
             'currentYear'                   => $this->currentYear,
+            'url'                           => url()->current(),
             'sessions'                      => $this->getSessions(),
-            'url'                           => url('coursesearch'),
+            'searchUrl'                     => url('coursesearch'),
             'paramKey'                      => 'name', // paramKey is passed in the url to the API eg ?name=bonsai
-            'allowNewModel'                 => true // allow user to select a non-existing model/course
+            'allowNewModel'                 => true, // allow user to select a non-existing model/course
+            'effectiveFrom'                 => $this->getEffectiveFrom(),
         ]);
     }
 }
