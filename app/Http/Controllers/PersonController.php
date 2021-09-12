@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 use App\Rules\CloseMatchingNames;
 use App\Helpers\Utils;
 use App\MembershipHistory;
+use App\Traits\Allowable;
 
 class PersonController extends Controller
 {
+    use Allowable;
     /**
      * custom error messages when incorrect data is entered
      */
@@ -321,7 +323,8 @@ class PersonController extends Controller
      */
     public function edit(Person $person)
     {
-        return view('person.edit');
+        // return view('person.edit');
+        return static::userAllowable('person.edit');
     }
 
     /**

@@ -210,8 +210,8 @@ class MenuRepository extends Controller
             case 31:
                 return [
                     'text' => 'Courses',
-                    'type' => 'report',
-                    'href' => '31'
+                    'type' => 'route',
+                    'href' => 'course.edit'
                 ];
                 break;
             case 32:

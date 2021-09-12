@@ -12,6 +12,7 @@ class EditCoursesComposer
     private $course;
     private $currentYear;
     private $courseId;
+    private $state;
 
     public function __construct()
     {
@@ -78,7 +79,7 @@ class EditCoursesComposer
      * Initialize the Course
      */
     private function getCourse() {
-        if ($this->courseId == -1) {
+        if ($this->state == 'course search') {
             $this->course = new Course;
             $this->course->id = -1;
             $this->course->name = ucfirst(strtolower(request()->input('course_name', null)));
@@ -91,7 +92,7 @@ class EditCoursesComposer
     }
 
     private function getSessions() {
-        if ($this->courseId == -1) {
+        if ($this->state == 'course search') {
             return [];
         } else {
             return $this->course->sessions();
@@ -120,6 +121,9 @@ class EditCoursesComposer
             'state'                         => $this->state,
             'currentYear'                   => $this->currentYear,
             'sessions'                      => $this->getSessions(),
+            'url'                           => url('coursesearch'),
+            'paramKey'                      => 'name', // paramKey is passed in the url to the API eg ?name=bonsai
+            'allowNewModel'                 => true // allow user to select a non-existing model/course
         ]);
     }
 }
