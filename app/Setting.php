@@ -96,4 +96,57 @@ class Setting extends Model
     {
         return $this->belongsTo('App\Person','id','updated_by');
     }
+
+    /**
+     * Return a collection of term dates compared to today
+     * If $alternateTermDates is not null, this will be used instead of the term dates in settings
+     * Returned: relativeTernDates where
+     *      relativeTermDates->term = which term today is in
+     *      relativeTermDates->thisTermStartDate = the date that this term started
+     *      relativeTermDates->thisTermEndDate = the date that this term ends
+     *      relativeTermDates->nextTermStartDate = the date that next term starts
+     *      relativeTermDates->nextTermEndDate = the date that next term ends
+     *      relativeTermDates->startOfYear = the date that the year starts (date of start of term one)
+     *      relativeTermDates->endOfYear = the date that the year ends (date of end of the last term)
+     */
+    static public function termDatesComparedToToday($alternateTermDates = NULL) {
+        $termDates = json_decode($alternateTermDates ?? Setting::currentSetting()->terms);
+        $today = Utils::today();
+        $numberOfTerms = count($termDates)-1; // '-1' for zero-based arrays
+
+        $relativeTermDates      = ['startOfYear'        => $termDates[0]->start];
+        $relativeTermDates     += ['endOfYear'          => $termDates[$numberOfTerms]->end];
+        if ($today > $termDates[$numberOfTerms]->end) {
+            $relativeTermDates += ['term'               => null];
+            $relativeTermDates += ['thisTermStartDate'  => null];
+            $relativeTermDates += ['thisTermEndDate'    => null];
+            $relativeTermDates += ['nextTermStartDate'  => null];
+            $relativeTermDates += ['nextTermEndDate'    => null];
+        } else {
+            for ($i = 0; $i <= $numberOfTerms; $i++) {
+                if ($today < $termDates[$i]->start) {
+                    $relativeTermDates += ['term'                   => null];
+                    $relativeTermDates += ['thisTermStartDate'      => null];
+                    $relativeTermDates += ['thisTermEndDate'        => null];
+                    $relativeTermDates += ['nextTermStartDate'      => $termDates[$i]->start];
+                    $relativeTermDates += ['nextTermEndDate'        => $termDates[$i]->end];
+                    break;
+                }
+                if ($today <= $termDates[$i]->end) {
+                    $relativeTermDates += ['term'                   => $i+1];
+                    $relativeTermDates += ['thisTermStartDate'      => $termDates[$i]->start];
+                    $relativeTermDates += ['thisTermEndDate'        => $termDates[$i]->end];
+                    if ($i = $numberOfTerms) {
+                        $relativeTermDates += ['nextTermStartDate'  => null];
+                        $relativeTermDates += ['nextTermEndDate'    => null];
+                    } else {
+                        $relativeTermDates += ['nextTermStartDate'  => $termDates[$i+1]->start];
+                        $relativeTermDates += ['nextTermEndDate'    => $termDates[$i+1]->end];
+                    }
+                    break;
+                }
+            }
+        }
+        return (object) $relativeTermDates;
+    }
 }
