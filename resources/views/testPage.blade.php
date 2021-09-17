@@ -11,13 +11,16 @@
 
 
 <div id = "course">
-    <singleentry model="course" ajaxurl='http://127.0.0.1/~gregvinall/bathurstu3a/db21/index.php/coursesearch'></singleentry>
+    <singleentry model="course" allownewmodels="true" ajaxurl="{{ url('coursesearch') }}"></singleentry>
 </div>
 <div id = "venue">
     <singleentry model="venue" ajaxurl='http://127.0.0.1/~gregvinall/bathurstu3a/db21/index.php/venuesearch'></singleentry>
 </div>
 <div id = "address">
     <singleentry model="address" ajaxurl='http://127.0.0.1/~gregvinall/bathurstu3a/db21/index.php/addresssearch' searchparameterkey='address'></singleentry>
+</div>
+<div id = "name">
+    <singleentry model="member" ajaxurl='http://127.0.0.1/~gregvinall/bathurstu3a/db21/index.php/onelineclosenamesearch'></singleentry>
 </div>
 <script src = "{{ asset('js/singleentry.js') }}"></script>
 
@@ -28,8 +31,11 @@ var vm = new Vue({
 var vm1 = new Vue({
    el: '#venue'
 });
-var vm1 = new Vue({
+var vm2 = new Vue({
    el: '#address'
+});
+var vm3 = new Vue({
+   el: '#name'
 });
 </script>
 

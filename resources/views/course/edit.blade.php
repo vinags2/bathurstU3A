@@ -11,13 +11,24 @@
         @include('partials.commonUI.pageHeading', ['pageHeading' => 'Edit, rejoin or new Course'])
         @include('partials.commonUI.showSuccessOrErrors')
         @if (!$showDetails)
-            @include('partials.search.singleentry', [
+            <div id = "course">
+                <singleentry model="course" ajaxurl='{{ $searchUrl }}'></singleentry>
+            </div>
+{{--            @include('partials.search.singleentry', [
                 'modelName'   => $course->name,
                 'model'       => 'course',
                 'searchUrl'   => $searchUrl,
                 'allNewModel' => $allowNewModel,
                 'identifier'  => 'course1'
             ])
+--}}
+<script src = "{{ asset('js/singleentry.js') }}"></script>
+
+<script>
+var vm = new Vue({
+   el: '#course'
+});
+</script>
         @else
         <form id="mainForm" method="post" action="{{ route('course.store') }}">
             @csrf

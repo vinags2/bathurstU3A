@@ -53,6 +53,7 @@ Route::post('termDates/{id?}', 'TermDatesController@store') -> middleware('verif
 // Routes for AJAX calls from logged in user.
 Route::get('/namesearch','PersonController@search') ->middleware('verified')->name('namesearch');
 Route::get('/closenamesearch','PersonController@closesearch') ->middleware('verified')->name('closenamesearch');
+Route::get('/onelineclosenamesearch','PersonController@onelineclosesearch') ->middleware('verified')->name('onelineclosenamesearch');
 Route::get('/addresssearch','AddressController@search') ->middleware('verified')->name('addresssearch');
 Route::get('/coursesearch','CourseController@search') ->middleware('verified')->name('coursesearch');
 Route::get('/venuesearch','VenueController@search') ->middleware('verified')->name('venuesearch');

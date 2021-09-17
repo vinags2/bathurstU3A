@@ -378,6 +378,16 @@ class PersonController extends Controller
     }
  
     /**
+     * return a json of close-matching names
+     * where the search is based on the format partial_first_name.' '.partial_last_name
+     *
+     */
+    public function onelineclosesearch(Request $request) {
+        $names = explode(' ', $request->input('name'), 3);
+        return $this->dotheclosesearch($names[0], $names[1] ?? '');
+    }
+
+    /**
      * Return a json of close-matching names
      *
      * @return \Illuminate\Http\Response
@@ -386,6 +396,16 @@ class PersonController extends Controller
     {
         $first_name = $request->input('first_name');
         $last_name = $request->input('last_name');
+        return $this->dotheclosesearch($first_name, $last_name);
+    }
+
+    /**
+     * Return a json of close-matching names
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function dotheclosesearch($first_name, $last_name)
+    {
         $members = Person::select('id','name', 'first_name', 'last_name', 'phone', 'mobile', 'email')
             ->where('first_name','like','%'.$first_name.'%')
             ->where('last_name','like','%'.$last_name.'%')
@@ -394,6 +414,10 @@ class PersonController extends Controller
             ->get();
         return response()->json($members);
     }
+
+    /**
+     * Remove all spaces from phone numbers
+     */
 
     /**
      * Remove all spaces from phone numbers
