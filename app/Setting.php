@@ -108,6 +108,14 @@ class Setting extends Model
      *      relativeTermDates->nextTermEndDate = the date that next term ends
      *      relativeTermDates->startOfYear = the date that the year starts (date of start of term one)
      *      relativeTermDates->endOfYear = the date that the year ends (date of end of the last term)
+     *      relativeTermDates->startOfLastTerm = the date of the start of the last term
+     * 
+     *  Logic:
+     *  - if today is after the last term date of the year, set all settings to null
+     *  - else for each term:
+     *  - if today is before the start of term, set current term settings to null, and next term to appropriate values
+     *  - if today is before (or equal to) the end of term, set this term settings, and last term settings
+     *          (alllowing for the last term of the year to not have a next term)
      */
     static public function termDatesComparedToToday($alternateTermDates = NULL) {
         $termDates = json_decode($alternateTermDates ?? Setting::currentSetting()->terms);
@@ -116,6 +124,7 @@ class Setting extends Model
 
         $relativeTermDates      = ['startOfYear'        => $termDates[0]->start];
         $relativeTermDates     += ['endOfYear'          => $termDates[$numberOfTerms]->end];
+        $relativeTermDates     += ['startOfLastTerm'    => $termDates[$numberOfTerms]->start];
         if ($today > $termDates[$numberOfTerms]->end) {
             $relativeTermDates += ['term'               => null];
             $relativeTermDates += ['thisTermStartDate'  => null];
@@ -148,5 +157,24 @@ class Setting extends Model
             }
         }
         return (object) $relativeTermDates;
+    }
+
+    /**
+     * return the most appropriate time for when user changes should take effect
+     *      'nextYear' if today is after the start of the last term of the year
+     *      'immediately' if not during term 
+     *      'nextTerm' otherwise
+     */
+    static public function effectiveFrom() {
+        $relativeTermDates = Setting::termDatesComparedToToday();
+        $today = Utils::today();
+
+        if ($today >= $relativeTermDates->startOfLastTerm) {
+            return 'nextYear';
+        }
+        if (!isset($relativeTermDates->term)) {
+            return 'immediately';
+        }
+        return 'nextTerm';
     }
 }

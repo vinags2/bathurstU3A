@@ -22,12 +22,6 @@ class TestPageComposer
 
     public function __construct()
     {
-        $terms = Setting::currentSetting()->terms;
-        $decoded = json_decode($terms);
-        $object = json_decode("[{'term1_start':'2020-02-01'}]");
-        $object2 = (object) ['term2_start' => '2020-02-01', 'term2_end' => '2020-04-23'];
-        $temp = Setting::termDatesComparedToToday();
-        dd($temp, $temp->thisTermStartDate, Utils::today());
         $this->initializeVariables();
     }
 

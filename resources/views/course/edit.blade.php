@@ -12,10 +12,11 @@
         @include('partials.commonUI.showSuccessOrErrors')
         @if (!$showDetails)
             @include('partials.search.singleentry', [
-                'modelName' => $course->name,
-                'model'     => 'course',
-                'searchUrl' => $searchUrl,
-                'allNewModel' => $allowNewModel
+                'modelName'   => $course->name,
+                'model'       => 'course',
+                'searchUrl'   => $searchUrl,
+                'allNewModel' => $allowNewModel,
+                'identifier'  => 'course1'
             ])
         @else
         <form id="mainForm" method="post" action="{{ route('course.store') }}">
@@ -95,27 +96,66 @@
                     <input type="date" size="20" id="effective_from_date" class="form-control @error('effectiveFromDate') is-invalid @enderror" name="effective_from_date" value="{{ old('effective_from_date',date('Y-m-d', strtotime($effectiveFromDate))) }}">
                     </td>
                 </tr>
-                    {{-- <input class="form-check-input ml-3 @error('prefer_email') is-invalid @enderror" type="radio" name="prefer_email" value="0"
-                        {{ $person['prefer_email'] == '0' || old('prefer_email') == '0' ?  'checked' : '' }}>
-                    <label class="form-check-label ml-5" for="prefer_email">post</label><BR> --}}
-                        @error('effective_from')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    {{--
-                    <SMALL>To keep our costs down, we would really appreciate if you elected to receive your newsletters by email.</SMALL>
-                    --}}
+            </table>
+            <table class="table-sm" id="sessionsTable">
+                @foreach ($sessions as $session)
+                        @php
+                            $thisSession = 'sessions'.($loop->index+1);
+                            $thisSessionId = 'sessionId'.($loop->index+1);
+                        @endphp
+                    <tr v-if="session[{{$loop->index}}]">
+                        <td><b>Session {{ $loop->index+1 }}:</b></td>
+                    </tr>
+                    <tr v-if="session[{{$loop->index}}]">
+                        <td><label class="col-xs-3 col-form-label mr-2" for="{{ $thisSession }}">Name:</label></td>
+                        <td><input type="text" size="40" id="{{ $thisSession }}" class="form-control" name="{{ $thisSession }}" value="{{ old($thisSession, $session->name) }}"></td>
+                        <input type="hidden" id="{{ $thisSessionId }}" name="{{ $thisSessionId }}" value="{{ $session->id }}"/>
+                    </tr>
+            @include('partials.search.singleentry', [
+                'modelName'   => $course->name,
+                'model'       => 'course',
+                'searchUrl'   => $searchUrl,
+                'allNewModel' => false,
+                'identifier'  => $thisSession
+            ])
+                @endforeach
+                <tr>
+                    <td colspan="2" class="pt-4" >
+                        <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
+                        <button type="submit" name="save" class="btn btn-primary btn-sm" value="true">Save</button>
+                        <button type="reset" class="btn btn-primary btn-sm">Reset</button>
+                    </td>
+                </tr>
+            </table>
+            <table class="table-sm" id="buttonsTable">
                 <tr>
                     <td colspan="2">
-                        <button type="submit" name="join" value="true" class="btn btn-primary btn-sm">Save</button>
+                        <button type="submit" name="join" value="true" class="btn btn-primary btn-sm">Next</button>
                         <button type="button" onclick=cancelForm("{{ route('course.edit') }}") class="btn btn-primary btn-sm">Back</button>
                     </td>
                 </tr>
             </table>
+            <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
             <input type="hidden" id="memberId" value="{{ $course->id }}" name="memberId" />
             <input type="hidden" id="state" value="{{ $state }}" name="state" />
         </form>
+        <script>
+            var app2 = new Vue({
+            el: '#sessionsTable',
+            data: {
+                session: [],
+            },
+            created: function () {
+                for (i=0; i < 6; i++) { 
+                    if (i < 2) {
+                        this.session[i] = true
+                    } else {
+                        this.session[i] = false
+                    }
+                }
+            },
+            })
+        </script>
         @endif
     </div>
 @endsection

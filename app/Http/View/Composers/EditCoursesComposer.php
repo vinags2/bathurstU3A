@@ -4,6 +4,7 @@ namespace App\Http\View\Composers;
 
 use Illuminate\View\View;
 use App\Course;
+use App\Setting;
 use App\Session;
 use App\Helpers\Utils;
 
@@ -13,6 +14,8 @@ class EditCoursesComposer
     private $currentYear;
     private $courseId;
     private $state;
+    private $sessions;
+    private $numberOfSessions;
 
     public function __construct()
     {
@@ -93,10 +96,12 @@ class EditCoursesComposer
     }
 
     private function getSessions() {
-        if ($this->state == 'course search') {
-            return [];
+        if (($this->state == 'course search') or ($this->course->id == -1)) {
+            $this->sessions = null;
+            $this->numberOfSessions = 0;
         } else {
-            return $this->course->sessions();
+            $this->sessions = $this->course->sessions()->get();
+            $this->numberOfSessions = count($this->sessions);
         }
     }
 
@@ -111,15 +116,12 @@ class EditCoursesComposer
         return $nextYear . '/01/01';
     }
 
-    /**
-     * get the effective_from
-     * 
-     * if today is the last term of the year, set to 'nextYear', 
-     * if before the start of the first term, set to 'immediately',
-     * otherwise set to 'nextTerm'
-     */
-    private function getEffectiveFrom() {
-        return 'nextTerm';
+    private function padSessions($sessions, $number_of_sessions) {
+        for ($i = 0; $i < 6-$number_of_sessions; $i++) {
+            $j = $number_of_sessions + $i;
+            $sessions[$j] = new Session();
+        }
+        return $sessions;
     }
 
     /**
@@ -133,11 +135,12 @@ class EditCoursesComposer
             'state'                         => $this->state,
             'currentYear'                   => $this->currentYear,
             'url'                           => url()->current(),
-            'sessions'                      => $this->getSessions(),
+            'sessions'                      => $this->padSessions($this->sessions, $this->numberOfSessions),
             'searchUrl'                     => url('coursesearch'),
             'paramKey'                      => 'name', // paramKey is passed in the url to the API eg ?name=bonsai
             'allowNewModel'                 => true, // allow user to select a non-existing model/course
-            'effectiveFrom'                 => $this->getEffectiveFrom(),
+            'effectiveFrom'                 => Setting::effectiveFrom(),
+            'numberOfSessions'              => $this->numberOfSessions,
         ]);
     }
 }

@@ -5,8 +5,9 @@
     - $url -- the url to pass to the API
     - $paramKey -- the name of the parameter to pass in the url to the API [optional; default = 'name']
     - $allowNewModel -- boolean as to whether the user to pick a new model which doesn't exist in the database [optional; default = false]
+    - $identifier - must be unique for other calls to this blade partial. Can be anything which is a valid id and variable name.
 -->
-    <form id="findMatches" v-bind:action="href" autocomplete="off" method="GET">
+    <form id="{{$identifier}}" v-bind:action="href" autocomplete="off" method="GET">
         <table>
             <tr><td></td></tr>
             <tr>
@@ -47,8 +48,8 @@
     </form>
 
         <script>
-            var app = new Vue({
-            el: '#findMatches',
+            var {{$identifier}} = new Vue({
+            el: '#{{$identifier}}',
             data: {
                 config: '{{ $model }}',
                 axiosUrl: '{{ $searchUrl }}',
