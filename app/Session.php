@@ -66,8 +66,8 @@ class Session extends Model
     /**
      * Get the person who is a backup facilitator for the session
      */
-    public function backup_facilitator()
+    public function alternate_facilitator_details()
     {
-        return $this->belongsTo('App\Person','id','alternate_facilitator');
+        return $this->belongsTo('App\Person','alternate_facilitator');
     }
 }

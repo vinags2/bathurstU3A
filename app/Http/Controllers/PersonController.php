@@ -406,12 +406,20 @@ class PersonController extends Controller
      */
     public function dotheclosesearch($first_name, $last_name)
     {
-        $members = Person::select('id','name', 'first_name', 'last_name', 'phone', 'mobile', 'email')
-            ->where('first_name','like','%'.$first_name.'%')
-            ->where('last_name','like','%'.$last_name.'%')
-            ->limit(10)
-            ->orderBy('last_name')
-            ->get();
+        $members = $last_name == '' ?  
+            Person::select('id','name', 'first_name', 'last_name', 'phone', 'mobile', 'email')
+                ->where('first_name','like','%'.$first_name.'%')
+                ->orWhere('last_name','like','%'.$first_name.'%')
+                ->limit(10)
+                ->orderBy('last_name')
+                ->get()
+            :
+            Person::select('id','name', 'first_name', 'last_name', 'phone', 'mobile', 'email')
+                ->where('first_name','like','%'.$first_name.'%')
+                ->where('last_name','like','%'.$last_name.'%')
+                ->limit(10)
+                ->orderBy('last_name')
+                ->get();
         return response()->json($members);
     }
 

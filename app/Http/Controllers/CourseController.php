@@ -38,6 +38,7 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         // check that course name is unique
+        dd($request->input());
     }
 
     /**

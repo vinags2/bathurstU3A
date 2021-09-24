@@ -177,4 +177,15 @@ class Setting extends Model
         }
         return 'nextTerm';
     }
+
+    static public function effectiveFromOptions($includeOther = false) {
+        $lav = [];
+        $lav[0] = (object) ['label' => 'next term', 'value' => 'nextTerm'];
+        $lav[1] = (object) ['label' => 'next year', 'value' => 'nextYear'];
+        $lav[2] = (object) ['label' => 'immediately', 'value' => 'immediately'];
+        if ($includeOther) {
+            $lav[3] = (object) ['label' => 'other', 'value' => 'other'];
+        }
+        return json_encode($lav);
+    }
 }
