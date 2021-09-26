@@ -22,6 +22,9 @@ Vue.component('RadioButtonsWithLabels',{
         type: Array,
         required: true
      },
+     title: {
+        type: String
+     },
      checkedValue: {
        type: String,
        required: true
@@ -33,6 +36,7 @@ Vue.component('RadioButtonsWithLabels',{
    template: `<div>
       <RadioButtonWithLabel v-for="labelAndValue in labelsAndValues" :key="labelAndValue.value"
           name="name"
+          :title="title"
           :value="labelAndValue.value"
           :label="labelAndValue.label"
           :isChecked="labelAndValue.value == checkedValue">

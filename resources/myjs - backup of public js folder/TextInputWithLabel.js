@@ -19,6 +19,12 @@ Vue.component('TextInputWithLabel',{
         type: String,
         default: 'Name'
      },
+     title: {
+        type: String,
+     },
+     buttonTitle: {
+        type: String,
+     },
      value: {
        type: String,
        default: ''
@@ -48,6 +54,7 @@ Vue.component('TextInputWithLabel',{
             :class    ="{'is-invalid': isError }"
             :name     ="name"
             :value    ="inputValue"
+            :title    = "title"
           />
         </div>
         <div class="col-1">
@@ -55,6 +62,7 @@ Vue.component('TextInputWithLabel',{
             type      ="button"
             class     ="btn btn-outline-secondary btn-sm disabled ml-n4"
             @click    ="clear"
+            title    ="Click to clear."
           >
             X
           </button>

@@ -49,15 +49,16 @@ Vue.component('SingleEntryWithDbLookup',{
                  <input
                     type="text"
                     class="w-100"
-                    v-bind:placeholder="prompt"
-                    v-bind:autofocus="setFocus"
+                    :placeholder="prompt"
+                    :autofocus="setFocus"
                     ref="toSearchFor"
                     v-model="toSearchFor"
+                    :title="title"
                     value=""
                 />
                 <input
                     type="hidden"
-                    v-bind:name="name"
+                    :name="name"
                     v-model="toSearchForId"
                     value=""
                 />
@@ -84,7 +85,7 @@ Vue.component('SingleEntryWithDbLookup',{
                         </option>
                         <option
                             v-for="APIresult in APIresults"
-                            v-bind:value="APIresult">
+                            :value="APIresult">
                               {{ displayProperty(APIresult) }}
                         </option>
                 </select>
@@ -100,6 +101,7 @@ Vue.component('SingleEntryWithDbLookup',{
          APIresults: [], // return result from API call.
          selectedtoSearchFor: '', // linked to the value of the selected option in the dropdown (an APIresult)
          showMatches: false,
+         title: 'Enter ' + _.toLower(this.model) + ' name, or part thereof. Click on the appropriate match in the dropdown box below.',
          doSearch: true
       }
    },

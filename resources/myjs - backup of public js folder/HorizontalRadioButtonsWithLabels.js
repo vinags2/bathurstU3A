@@ -22,6 +22,9 @@ Vue.component('HorizontalRadioButtonsWithLabels',{
         type: Array,
         required: true
      },
+     title: {
+       type: String
+     },
      checkedValue: {
        type: String,
        required: true
@@ -34,8 +37,10 @@ Vue.component('HorizontalRadioButtonsWithLabels',{
             :name     ="name"
             :checked  ="labelAndValue.value == checkedValue"
             :value    ="labelAndValue.value"
+            :title    ="title"
           />
-          <label class="mr-3">
+          <label class="mr-3"
+            :title    ="title">
             {{labelAndValue.label}}
           </label>
    </div>

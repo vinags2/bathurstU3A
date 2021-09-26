@@ -20,6 +20,9 @@ Vue.component('RadioButtonWithDateInput',{
         type: String,
         required: true
      },
+     title: {
+       type: String
+     },
      isChecked: {
        type: Boolean,
        default: false
@@ -39,13 +42,16 @@ Vue.component('RadioButtonWithDateInput',{
             :name     ="name"
             :checked  ="inputValue"
             :value    ="value"
+            :title    ="title"
             class=""
           />
-          <label class="mr-3">
+          <label class="mr-3"
+            :title    ="title">
             {{label}}
           </label>
           <input
             type="date"
+            :title="title"
             size="20"
             name="dateName"
             :value="dateValue">

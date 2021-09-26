@@ -28,6 +28,12 @@ Vue.component('HorizontalInputsWithLabels',{
      value2: {
        type: String,
      },
+     title1: {
+       type: String
+     },
+     title2: {
+       type: String
+     },
      label: {
         type: String,
      },
@@ -45,23 +51,25 @@ Vue.component('HorizontalInputsWithLabels',{
      }
    },
    template: `<div class="row">
-      <div class="col-1">
+      <div class="col-1" :title="firstTitle">
           <label>
             {{firstLabel}}
           </label>
       </div>
       <div class="col-4">
-          <label v-if="label">
+          <label v-if="label" :title="title1">
             {{label1}}
           </label>
           <input
             :type     ="inputType"
             :name     ="name1"
             :value    ="value1"
-            :class     ="secondClass"
-            size="3"
+            :class    ="secondClass"
+            size      ="3"
+            :title    ="title1"   
+            :checked  ="inputValue1"
           />
-          <label class="ml-2">
+          <label class="ml-2" :title="title2">
             {{label2}}
           </label>
           <input
@@ -69,7 +77,9 @@ Vue.component('HorizontalInputsWithLabels',{
             :name     ="name2"
             :value    ="value2"
             class     ="ml-2"
-            size="3"
+            size      ="3"
+            :title    ="title2"   
+            :checked  ="inputValue2"
           />
       </div>
    </div>`,
@@ -78,7 +88,10 @@ Vue.component('HorizontalInputsWithLabels',{
        firstLabel: this.label ?? this.label1,
        secondLabel: this.label ? this.label1 : '',
        thirdLabel: this.label2,
-       secondClass: this.label ? "ml-2" : "1"
+       secondClass: this.label ? "ml-2" : "1",
+       inputValue1: this.value1 == 'true',
+       inputValue2: this.value2 == 'true',
+       firstTitle: this.label ? "" : this.title1
      }
    }
 });

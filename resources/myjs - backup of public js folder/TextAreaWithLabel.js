@@ -16,6 +16,9 @@ Vue.component('TextAreaWithLabel',{
        type: String,
        required: true
      },
+     title: {
+       type: String
+     },
      rows: {
        type: Number,
        default: 7
@@ -52,6 +55,7 @@ Vue.component('TextAreaWithLabel',{
             :class    ="{'is-invalid': isError }"
             :name     ="name"
             :rows     ="rows"
+            :title    ="title"
             :value    ="inputValue" >
             {{value}}
           </textarea>
@@ -60,6 +64,7 @@ Vue.component('TextAreaWithLabel',{
           <button
             type      ="button"
             class     ="btn btn-outline-secondary btn-sm disabled ml-n4"
+            title     ="Click to clear."
             @click    ="clear"
           >
             X

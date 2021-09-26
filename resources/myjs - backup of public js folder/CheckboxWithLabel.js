@@ -16,7 +16,10 @@ Vue.component('CheckboxWithLabel',{
      },
      label: {
         type: String,
-        default: 'Suspended'
+        default: 'Suspend'
+     },
+     title: {
+       type: String,
      },
      isChecked: {
        type: Boolean,
@@ -30,7 +33,7 @@ Vue.component('CheckboxWithLabel',{
    template: `
       <div class="row">
         <div v-if="rightPlacement" :class="classForLabel">
-          <label>
+          <label :title="title">
             {{label}}:
           </label>
         </div>
@@ -40,6 +43,7 @@ Vue.component('CheckboxWithLabel',{
             :name     ="name"
             :checked  ="inputValue"
             :class="classForCheckbox"
+            :title="title"
           />
         </div>
         <div v-if="leftPlacement" :class="classForLabel">

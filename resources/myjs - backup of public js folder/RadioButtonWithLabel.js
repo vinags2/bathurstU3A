@@ -18,6 +18,9 @@ Vue.component('RadioButtonWithLabel',{
         type: String,
         required: true
      },
+     title: {
+       type: String
+     },
      isChecked: {
        type: Boolean,
        default: false
@@ -33,9 +36,11 @@ Vue.component('RadioButtonWithLabel',{
             :name     ="name"
             :checked  ="inputValue"
             :value    ="value"
+            :title    ="title"
           />
         <div class="col-4">
-          <label>
+          <label
+            :title    ="title">
             {{label}}
           </label>
         </div>

@@ -16,7 +16,6 @@
 <script src = "{{ asset('js/RadioButtonsWithLabels.js') }}"></script>
 <script src = "{{ asset('js/RadioButtonWithDateInput.js') }}"></script>
 <script src = "{{ asset('js/DropdownWithLabel.js') }}"></script>
-<script src = "{{ asset('js/DropdownAndCheckboxWithLabel.js') }}"></script>
 <script src = "{{ asset('js/HorizontalRadioButtonsWithLabels.js') }}"></script>
 <script src = "{{ asset('js/HorizontalInputsWithLabels.js') }}"></script>
 
@@ -93,7 +92,6 @@
                     $thisFacilitatorValue = $facilitators[$loop->index];
                     $thisAlternateFacilitatorValue = $alternate_facilitators[$loop->index];
                     $thisVenueValue = $venues[$loop->index];
-                    $thisSessionPrintContactsValue = ($session->roll_type / 64) >=1 ? "true" : "false";
                 @endphp
                     <input
                         type="hidden"
@@ -101,14 +99,16 @@
                         value="{{ $session->id }}"
                     />
                     <subheading
+                        v-if="{{ $thisSessionValue }}"
                         subheading="Session {{ $loop->index+1 }}:"  :width="5">
                     </subheading>
                     <text-input-with-label
+                        v-if="{{ $thisSessionValue }}"
                         name="{{ $thisSession }}"
                         title="The name of this session. A course can be run several times a week. Each session must have a name. It can be the same as the course name."
                         value="{{ old($thisSession, $session->name) }}">
                     </text-input-with-label>
-                    <div >
+                    <div v-if="{{ $thisSessionValue }}">
                         <single-entry-with-db-lookup
                             model="facilitator"
                             ajax-url="{{ url('onelineclosenamesearch') }}"
@@ -120,7 +120,7 @@
                             >
                         </single-entry-with-db-lookup>
                     </div>
-                    <div >
+                    <div v-if="{{ $thisSessionValue }}">
                         <single-entry-with-db-lookup
                             model="facilitator"
                             ajax-url="{{ url('onelineclosenamesearch') }}"
@@ -128,7 +128,7 @@
                             :model-defaults="{{ $thisAlternateFacilitatorValue }}">
                         </single-entry-with-db-lookup>
                     </div>
-                    <div >
+                    <div v-if="{{ $thisSessionValue }}">
                         <single-entry-with-db-lookup
                             model="venue"
                             ajax-url="{{ url('venuesearch') }}"
@@ -136,7 +136,7 @@
                             :model-defaults="{{ $thisVenueValue }}">
                         </single-entry-with-db-lookup>
                     </div>
-                    <horizontal-inputs-with-labels 
+                    <horizontal-inputs-with-labels v-if="{{ $thisSessionValue }}"
                         label="Size:"
                         label1="Min:"
                         name1="{{ $thisSessionMaxClassSize }}" 
@@ -148,26 +148,26 @@
                         title2="Maximum class size (0 or empty for no maximum)"
                     >
                     </horizontal-inputs-with-labels>
-                    <div >
+                    <div v-if="{{ $thisSessionValue }}">
                         <dropdown-with-label
                             name="{{ $thisSessionDayOfTheWeek }}"
                             label="Held on"
                             title="On which day of the week does the session run?"
-                           selected-key="{{ old($thisSessionDayOfTheWeek, $session->day_of_the_week)}}"
+                            :selected-key="{{ old($thisSessionDayOfTheWeek, $session->day_of_the_week)}}"
                         >
                         </dropdown-with-label>
                     </div>
-                    <div >
+                    <div v-if="{{ $thisSessionValue }}">
                         <dropdown-with-label
                             name="{{ $thisSessionWeekOfTheMonth }}" 
                             label="Week"
                             title="If the session does not run every week of the month, select which week of the month."
-                            selected-key="{{ old($thisSessionWeekOfTheMonth,$session->week_of_the_month)}}"
+                            :selected-key="{{ old($thisSessionWeekOfTheMonth,$session->week_of_the_month)}}"
                             :options='[{key: 0, text: "Every week"},{key: 1, text: "Week 1"},{key: 2, text: "Week 2"},{key: 3, text: "Week 3"},{key: 4, text: "Week 4"}]'
                         >
                         </dropdown-with-label>
                     </div>
-                    <horizontal-inputs-with-labels 
+                    <horizontal-inputs-with-labels v-if="{{ $thisSessionValue }}"
                         input-type="time"
                         label1="From"
                         name1="{{ $thisSessionStartTime }}" 
@@ -179,19 +179,24 @@
                         title2="The time of the day that the class ends. Must be later than the start time."
                     >
                     </horizontal-inputs-with-labels>
-                    <dropdown-and-checkbox-with-label
-                        name1="{{ $thisSessionRollType }}" 
-                        label1="Rolls"
-                        title1="Roll types are: normal, generic (no names on roll), 2-page generic, monthly (one per month), no roll"
-                        selected-key="{{ old($thisSessionRollType,$session->roll_type % 64) }}"
-                        :options='[{key: 0, text: "Normal"},{key: 1, text: "Generic"},{key: 4, text: "2 page generic"},{key: 32, text: "Monthly"},{key: 16, text: "No roll"},{key: 2, text: "Between terms roll"}]'
-                        label2="Contacts"
-                        name2="{{ $thisSessionPrintContacts }}"
-                        title2="Include contact details when printing rolls"
-                        :is-checked="{{ old($thisSessionPrintContacts, $thisSessionPrintContactsValue)}}"
+                    <div v-if="{{ $thisSessionValue }}">
+                        <dropdown-with-label
+                            name="{{ $thisSessionRollType }}" 
+                            label="Rolls"
+                            title="Roll types are: normal, generic (no names on roll), 2-page generic, monthly (one per month), no roll"
+                            :selected-key="{{ old($thisSessionRollType,$session->roll_type % 64) }}"
+                            :options='[{key: 0, text: "Normal"},{key: 1, text: "Generic"},{key: 4, text: "2 page generic"},{key: 32, text: "Monthly"},{key: 16, text: "No roll"},{key: 2, text: "Between terms roll"}]'
+                        >
+                        </dropdown-with-label>
+                    </div>
+                    <checkbox-with-label v-if="{{ $thisSessionValue }}"
+                            label="Contacts"
+                            name="{{ $thisSessionPrintContacts }}"
+                            title="Include contact details when printing rolls"
+                            :is-checked="{{ old($thisSessionPrintContacts, ($session->roll_type / 64) >=1)}}"
                     >
-                    </dropdown-and-checkbox-with-label>
-                    <horizontal-inputs-with-labels 
+                    </checkbox-with-label>
+                    <horizontal-inputs-with-labels v-if="{{ $thisSessionValue }}"
 
                         input-type="checkbox"
                         label1="Suspended"
@@ -201,10 +206,10 @@
                         label2="Delete"
                         name2="{{ $thisSessionDeleted }}" 
                         value2="{{ old('$thisSessionDeleted',$session->deleted)  == 1 ? 'true' : 'false' }}"
-                        title2="Is this session permanently no longer offerred? Deleting the session cannot be undone."
+                        title2="Is this session permanently no longer offerred? Deleting the course cannot be undone."
                         >
                     </horizontal-inputs-with-labels>
-                    <div >
+                    <div v-if="{{ $thisSessionValue }}">
                         <text-input-with-label
                             label="Notes"
                             title="Notes. Not visible except by authorised users. Maximum of 100 characters."
@@ -217,41 +222,39 @@
                 @php
                     $isOtherSelected=old('effective_from', $effectiveFrom) == 'other' ? "true" : "false"
                 @endphp
-                <div class="mt-3">
-                    <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
-                    <subheading
-                        subheading="Changes effective from" :width="5">
-                    </subheading>
-                    <horizontal-radio-buttons-with-labels
-                        name="effective_from"
-                        title="When do your changes take effect? Next term or next year maybe? If other, select the date for when they take effect."
-                        :labels-and-values="{{$effectiveFromOptions}}"
-                        checked-value="{{ old('effective_from', $effectiveFrom) }}">
-                    </horizontal-radio-buttons-with-labels>
-                    <radio-button-with-date-input
-                        name="effective_from"
-                        label="other"
-                        value="other"
-                        title="When do your changes take effect? Next term or next year maybe? If other, select the date for when they take effect."
-                        date-value="{{ old('effective_from_date',date('Y-m-d', strtotime($effectiveFromDate))) }}"
-                        :is-checked="{{ $isOtherSelected }}">
-                    </radio-button-with-date-input>
-                    <div class="row mt-3">
-                        <div>
-                            <button type="submit" name="save" class="btn btn-primary btn-sm" value="true">Save</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="submit" name="cancel" class="btn btn-primary btn-sm" value="true">Cancel</button>
-                        </div>
-                        <div class="ml-2">
-                            <button type="button" name="new" class="btn btn-primary btn-sm" value="true">New session</button>
-                        </div>
+                <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
+                <subheading
+                    subheading="Changes effective from" :width="5">
+                </subheading>
+                <horizontal-radio-buttons-with-labels
+                    name="effective_from"
+                    title="When do your changes take effect? Next term or next year maybe? If other, select the date for when they take effect."
+                    :labels-and-values="{{$effectiveFromOptions}}"
+                    checked-value="{{ old('effective_from', $effectiveFrom) }}">
+                </horizontal-radio-buttons-with-labels>
+                <radio-button-with-date-input
+                    name="effective_from"
+                    label="other"
+                    value="other"
+                    title="When do your changes take effect? Next term or next year maybe? If other, select the date for when they take effect."
+                    date-value="{{ old('effective_from_date',date('Y-m-d', strtotime($effectiveFromDate))) }}"
+                    :is-checked="{{ $isOtherSelected }}">
+                </radio-button-with-date-input>
+                <div class="row mt-3">
+                    <div>
+                        <button type="submit" name="save" class="btn btn-primary btn-sm" value="true">Save</button>
                     </div>
-                    <input type="hidden" id="id" name="id" value="{{ old('id', $course['id']) }}"/>
-                    <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
-                    <input type="hidden" id="memberId" value="{{ $course->id }}" name="memberId" />
-                    <input type="hidden" id="state" value="{{ $state }}" name="state" />
+                    <div class="ml-2">
+                        <button type="submit" name="cancel" class="btn btn-primary btn-sm" value="true">Cancel</button>
+                    </div>
+                    <div class="ml-2">
+                        <button type="button" name="new" class="btn btn-primary btn-sm" value="true">New session</button>
+                    </div>
                 </div>
+                <input type="hidden" id="id" name="id" value="{{ old('id', $course['id']) }}"/>
+                <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
+                <input type="hidden" id="memberId" value="{{ $course->id }}" name="memberId" />
+                <input type="hidden" id="state" value="{{ $state }}" name="state" />
             </div>
         </form>
         <script>
