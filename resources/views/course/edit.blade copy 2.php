@@ -72,85 +72,57 @@
                 @foreach ($sessions as $session)
                 <div class="mt-3">
                     @php
+                    $thisSessionStartTime = 'sessionStartTimes['.($loop->index).']';
+                    $thisSessionEndTime = 'sessionEndTimes['.($loop->index).']';
+                    $thisSessionWeekOfTheMonth = 'sessionWeekOfTheMonths['.($loop->index).']';
+                    $thisSessionDayOfTheWeek = 'sessionDayOfTheWeeks['.($loop->index).']';
+                    $thisSessionDescription = 'sessionDescriptions['.($loop->index).']';
+                    $thisSessionComment = 'sessionComments['.($loop->index).']';
+                    $thisSessionSuspended = 'sessionSuspendeds['.($loop->index).']';
+                    $thisSessionDeleted = 'sessionDeleteds['.($loop->index).']';
+                    $thisSessionRollType = 'sessionRollTypes['.($loop->index).']';
+                    $thisSessionPrintContacts = 'sessionPrintContacts['.($loop->index).']';
+                    $thisAlternateFacilitator = 'alternatefacilitators['.($loop->index).']';
+                    $thisVenue = 'venues['.($loop->index).']';
+                    $thisSessionMaxClassSize = 'sessionMaxClassSizes['.($loop->index).']';
+                    $thisSessionMinClassSize = 'sessionMinClassSizes['.($loop->index).']';
+                    $thisFacilitatorValue = $facilitators[$loop->index];
+                    $thisAlternateFacilitatorValue = $alternate_facilitators[$loop->index];
+                    $thisVenueValue = $venues[$loop->index];
+                    $thisSessionPrintContactsValue = $session->print_contact_details ? "true" : "false";
+                    $thisSessionStartTimeOld = 'sessionStartTimes.'.($loop->index);
+                    $thisSessionEndTimeOld = 'sessionEndTimes.'.($loop->index);
+                    $thisSessionWeekOfTheMonthOld = 'sessionWeekOfTheMonths.'.($loop->index);
+                    $thisSessionDayOfTheWeekOld = 'sessionDayOfTheWeeks.'.($loop->index);
+                    $thisSessionIdOld = 'sessionIds.'.($loop->index);
+                    $thisSessionDescriptionOld = 'sessionDescriptions.'.($loop->index);
+                    $thisSessionCommentOld = 'sessionComments.'.($loop->index);
+                    $thisSessionSuspendedOld = 'sessionSuspendeds.'.($loop->index);
+                    $thisSessionDeletedOld = 'sessionDeleteds.'.($loop->index);
+                    $thisSessionRollTypeOld = 'sessionRollTypes.'.($loop->index);
+                    $thisSessionPrintContactsOld = 'sessionPrintContactss.'.($loop->index);
+                    $thisFacilitatorOld = 'Facilitators.'.($loop->index);
+                    $thisAlternateFacilitatorOld = 'AlternateFacilitators.'.($loop->index);
+                    $thisVenueOld = 'Venues.'.($loop->index);
+                    $thisSessionMaxClassSizeOld = 'sessionMaxClassSizes.'.($loop->index);
+                    $thisSessionMinClassSizeOld = 'sessionMinClassSizes.'.($loop->index);
+
                     // variables to make it more readable
                     // 'old...' is the user entered data retrieved using the 'old' helper
                     // '....Name' is the name of the control, returned in the request
                     $loopIndex = '['.$loop->index.']';
                     $loopIndexInDotNotation = '.'.$loop->index;
-
                     // Session Name
                     $nameName = 'sessionNames'.$loopIndex;
                     $oldName = 'sessionNames'.$loopIndexInDotNotation;
-
                     // Session id
                     // There is not 'old' session id...the id does not change.
                     $sessionId = 'sessionIds'.$loopIndex;
-
                     // Facilitator
-                    // The facilitators array is an array of objects containing id and name
+                    // The facilitators array is an array of json encoded objects containing id and name
+                    // Only the facilitator id is saved
                     $facilitatorNameName = 'facilitatorname'.$loopIndex;
                     $facilitatorIdName = 'facilitatorid'.$loopIndex;
-                    $oldFacilitatorName = 'facilitatorname'.$loopIndexInDotNotation;
-                    $oldFacilitatorId = 'facilitatorid'.$loopIndexInDotNotation;
-                    $facilitator = $facilitators[$loop->index];
-
-                    // Alternate Facilitator
-                    $alternateFacilitatorNameName = 'alternatefacilitatorname'.$loopIndex;
-                    $alternateFacilitatorIdName = 'alternatefacilitatorid'.$loopIndex;
-                    $oldAlternateFacilitatorName = 'alternatefacilitatorname'.$loopIndexInDotNotation;
-                    $oldAlternateFacilitatorId = 'alternatefacilitatorid'.$loopIndexInDotNotation;
-                    $alternateFacilitator = $alternate_facilitators[$loop->index];
-
-                    // Venue
-                    $venueNameName = 'venuename'.$loopIndex;
-                    $venueIdName = 'venueid'.$loopIndex;
-                    $oldVenueName = 'venuename'.$loopIndexInDotNotation;
-                    $oldVenueId = 'venueid'.$loopIndexInDotNotation;
-                    $venue = $venues[$loop->index];
-
-                    // Session description
-                    $descriptionName = 'sessionDescriptions'.$loopIndex;
-                    $oldDescription = 'sessionDescriptions'.$loopIndexInDotNotation;
-
-                    // Class sizes
-                    $maxClassSizeName = 'sessionMaxClassSizes'.$loopIndex;
-                    $minClassSizeName = 'sessionMinClassSizes'.$loopIndex;
-                    $oldMaxClassSize = 'sessionMaxClassSizes'.$loopIndexInDotNotation;
-                    $oldMinClassSize = 'sessionMinClassSizes'.$loopIndexInDotNotation;
-
-                    // Day of the week
-                    $dayOfTheWeekName = 'sessionDayOfTheWeeks'.$loopIndex;
-                    $oldDayOfTheWeek = 'sessionDayOfTheWeeks'.$loopIndexInDotNotation;
-
-                    // Week of the month
-                    $weekOfTheMonthName = 'sessionWeekOfTheMonths['.($loop->index).']';
-                    $oldWeekOfTheMonth = 'sessionWeekOfTheMonths.'.($loop->index);
-
-                    // Start and End times
-                    $startTimeName = 'sessionStartTimes'.$loopIndex;
-                    $endTimeName = 'sessionEndTimes'.$loopIndex;
-                    $oldStartTime = 'sessionStartTimes'.$loopIndexInDotNotation;
-                    $oldEndTime = 'sessionEndTimes'.$loopIndexInDotNotation;
-
-                    //Rolls
-                    $rollTypeName = 'sessionRollTypes'.$loopIndex;
-                    $printContactsName = 'sessionPrintContacts'.$loopIndex;
-                    $oldRollType = 'sessionRollTypes'.$loopIndexInDotNotation;
-                    $oldPrintContacts = 'sessionPrintContacts'.$loopIndexInDotNotation;
-                    $rollType = $session->roll_type % 64;
-                    $printContact = $session->roll_type / 64 >= 1 ? "1" : "0";
-
-                    // Suspended and deleted
-                    $suspendedName = 'sessionSuspendeds'.$loopIndex;
-                    $deletedName = 'sessionDeleteds'.$loopIndex;
-                    $oldSuspended = 'sessionSuspendeds'.$loopIndexInDotNotation;
-                    $oldDeleted = 'sessionDeleteds'.$loopIndexInDotNotation;
-
-                    // Notes/comments
-                    $commentName = 'sessionComments'.$loopIndex;
-                    $oldComment = 'sessionComments'.$loopIndexInDotNotation;
-
-                    // Active terms
                     $defaultActiveTermsForTheSession = $activeTerms[$loop->index];
                 @endphp
                     <input
@@ -172,8 +144,8 @@
                             ajax-url="{{ url('onelineclosenamesearch') }}"
                             nameid="{{ $facilitatorIdName }}"
                             namename="{{ $facilitatorNameName }}"
-                            :model-id-default="{{ old($oldFacilitatorId, $facilitator->id) }}" 
-                            model-name-default="{{ old($oldFacilitatorName, $facilitator->name) }}" 
+                            :model-id-default="{{ $thisFacilitatorValue->id }}" 
+                            :model-name-default="{{ $thisFacilitatorValue->name }}" 
                             @if ($loop->index == 7)
                                 set-focus
                             @endif
@@ -184,58 +156,52 @@
                         <single-entry-with-db-lookup
                             model="facilitator"
                             ajax-url="{{ url('onelineclosenamesearch') }}"
-                            nameid="{{ $alternateFacilitatorIdName }}"
-                            namename="{{ $alternateFacilitatorNameName }}"
-                            :model-id-default="{{ old($oldAlternateFacilitatorId, $alternateFacilitator->id) ?? -1 }}" 
-                            model-name-default="{{ old($oldAlternateFacilitatorName, $alternateFacilitator->name) ?? '' }}" 
-                            >
+                            name="{{ $thisAlternateFacilitator }}"
+                            :model-defaults="{{ $thisAlternateFacilitatorValue }}">
                         </single-entry-with-db-lookup>
                     </div>
                     <div >
                         <single-entry-with-db-lookup
                             model="venue"
                             ajax-url="{{ url('venuesearch') }}"
-                            nameid="{{ $venueIdName }}"
-                            namename="{{ $venueNameName }}"
-                            :model-id-default="{{ old($oldVenueId, $venue->id) ?? -1 }}" 
-                            model-name-default="{{ old($oldVenueName, $venue->name) ?? '' }}" 
-                            >
+                            name="{{ $thisVenue }}"
+                            :model-defaults="{{ $thisVenueValue }}">
                         </single-entry-with-db-lookup>
                     </div>
                     <text-input-with-label
-                        name="{{ $descriptionName }}"
+                        name="{{ $thisSessionDescription }}"
                         title="This description of the session is appended to the course description. Keep it brief."
-                        value="{{ old($oldDescription, $session->description) }}"
+                        value="{{ old($thisSessionDescriptionOld, $session->description) }}"
                         :max-length=100
                         label="Description:">
                     </text-input-with-label>
                     <horizontal-inputs-with-labels 
                         label="Size:"
                         label1="Min:"
-                        name1="{{ $minClassSizeName }}" 
-                        value1="{{ old($oldMinClassSize,$session->minimum_session_size) }}"
+                        name1="{{ $thisSessionMinClassSize }}" 
+                        value1="{{ old($thisSessionMinClassSizeOld,$session->minimum_session_size) }}"
                         title1="Minimum class size (0 or empty for no minimum)"
                         label2="Max:"
-                        name2="{{ $maxClassSizeName }}" 
-                        value2="{{ old($oldMaxClassSize,$session->maximum_session_size) }}"
+                        name2="{{ $thisSessionMaxClassSize }}" 
+                        value2="{{ old($thisSessionMaxClassSizeOld,$session->maximum_session_size) }}"
                         title2="Maximum class size (0 or empty for no maximum)"
                     >
                     </horizontal-inputs-with-labels>
                     <div >
                         <dropdown-with-label
-                            name="{{ $dayOfTheWeekName }}"
+                            name="{{ $thisSessionDayOfTheWeek }}"
                             label="Held on"
                             title="On which day of the week does the session run?"
-                           selected-key="{{ old($oldDayOfTheWeek, $session->day_of_the_week)}}"
+                           selected-key="{{ old($thisSessionDayOfTheWeekOld, $session->day_of_the_week)}}"
                         >
                         </dropdown-with-label>
                     </div>
                     <div >
                         <dropdown-with-label
-                            name="{{ $weekOfTheMonthName }}" 
+                            name="{{ $thisSessionWeekOfTheMonth }}" 
                             label="Week"
                             title="If the session does not run every week of the month, select which week of the month."
-                            selected-key="{{ old($oldWeekOfTheMonth,$session->week_of_the_month)}}"
+                            selected-key="{{ old($thisSessionWeekOfTheMonthOld,$session->week_of_the_month)}}"
                             :options='[{key: 0, text: "Every week"},{key: 1, text: "Week 1"},{key: 2, text: "Week 2"},{key: 3, text: "Week 3"},{key: 4, text: "Week 4"}]'
                         >
                         </dropdown-with-label>
@@ -243,12 +209,12 @@
                     <horizontal-inputs-with-labels 
                         input-type="time"
                         label1="From"
-                        name1="{{ $startTimeName }}" 
-                        value1="{{ old($oldStartTime,$session->start_time) }}"
+                        name1="{{ $thisSessionStartTime }}" 
+                        value1="{{ old($thisSessionStartTimeOld,$session->start_time) }}"
                         title1="The time of the day that the class starts. Must be earlier than the end time."
                         label2="To"
-                        name2="{{ $endTimeName }}" 
-                        value2="{{ old($oldEndTime,$session->end_time) }}"
+                        name2="{{ $thisSessionEndTime }}" 
+                        value2="{{ old($thisSessionEndTimeOld,$session->end_time) }}"
                         title2="The time of the day that the class ends. Must be later than the start time."
                     >
                     </horizontal-inputs-with-labels>
@@ -281,30 +247,27 @@
                         @endforeach
                     </div>
                     <dropdown-and-checkbox-with-label
-                        name1="{{ $rollTypeName }}" 
+                        name1="{{ $thisSessionRollType }}" 
                         label1="Rolls"
                         title1="Roll types are: normal, generic (no names on roll), 2-page generic, monthly (one per month), no roll"
-                        selected-key="{{ old($oldRollType,$rollType) }}"
+                        selected-key="{{ old($thisSessionRollTypeOld,$session->roll_only) }}"
                         :options="{{ $rollTypeOptions }}"
                         label2="Contacts"
-                        name2="{{ $printContactsName }}"
+                        name2="{{ $thisSessionPrintContacts }}"
                         title2="Include contact details when printing rolls"
-                        @if (old($oldRollType,"undefined") != "undefined")
-                            :is-checked="{{ old($oldPrintContacts,0)}}"
-                        @else
-                            :is-checked="{{ old($printContact, 1)}}"
-                        @endif
+                        :is-checked="{{ old($thisSessionPrintContactsOld, $thisSessionPrintContactsValue)}}"
                     >
                     </dropdown-and-checkbox-with-label>
                     <horizontal-inputs-with-labels 
+
                         input-type="checkbox"
                         label1="Suspended"
-                        name1="{{ $suspendedName }}" 
-                        :checked1={{ old($oldSuspended,$session->suspended)  == 1 ? 1 : 0 }}
+                        name1="{{ $thisSessionSuspended }}" 
+                        :checked1={{ old($thisSessionSuspendedOld,$session->suspended)  == 1 ? 1 : 0 }}
                         title1="Is this session not running this term, or this year?"
                         label2="Delete"
-                        name2="{{ $deletedName }}" 
-                        :checked2={{ old($oldDeleted,$session->deleted)  == 1 ? 1 : 0 }}
+                        name2="{{ $thisSessionDeleted }}" 
+                        :checked2={{ old($thisSessionDeletedOld,$session->deleted)  == 1 ? 1 : 0 }}
                         title2="Is this session permanently no longer offerred? Deleting the session cannot be undone."
                         >
                     </horizontal-inputs-with-labels>
@@ -312,9 +275,9 @@
                         <text-input-with-label
                             label="Notes"
                             title="Notes. Not visible except by authorised users. Maximum of 100 characters."
-                            name="{{ $commentName }}" 
+                            name="{{ $thisSessionComment }}" 
                             :max-length=100
-                            value="{{ old($oldComment,$session->comment) }}">
+                            value="{{ old($thisSessionCommentOld,$session->comment) == 1 ? 1 : 0}}">
                         </text-input-with-label>
                     </div>
                 </div>
@@ -354,6 +317,7 @@
                     </div>
                     <input type="hidden" id="id" name="id" value="{{ old('id', $course['id']) }}"/>
                     <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
+                    <input type="hidden" id="memberId" value="{{ $course->id }}" name="memberId" />
                     <input type="hidden" id="state" value="{{ $state }}" name="state" />
                     <input type="hidden" :value="newSessions" name="numberOfNewSessions" />
                 </div>

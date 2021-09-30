@@ -100,7 +100,7 @@ class Setting extends Model
     /**
      * Return a collection of term dates compared to today
      * If $alternateTermDates is not null, this will be used instead of the term dates in settings
-     * Returned: relativeTernDates where
+     * Returned: relativeTermDates where
      *      relativeTermDates->term = which term today is in
      *      relativeTermDates->thisTermStartDate = the date that this term started
      *      relativeTermDates->thisTermEndDate = the date that this term ends
@@ -109,6 +109,7 @@ class Setting extends Model
      *      relativeTermDates->startOfYear = the date that the year starts (date of start of term one)
      *      relativeTermDates->endOfYear = the date that the year ends (date of end of the last term)
      *      relativeTermDates->startOfLastTerm = the date of the start of the last term
+     *      relativeTermDates->numberOfTerms = session->number_of_terms
      * 
      *  Logic:
      *  - if today is after the last term date of the year, set all settings to null
@@ -125,6 +126,7 @@ class Setting extends Model
         $relativeTermDates      = ['startOfYear'        => $termDates[0]->start];
         $relativeTermDates     += ['endOfYear'          => $termDates[$numberOfTerms]->end];
         $relativeTermDates     += ['startOfLastTerm'    => $termDates[$numberOfTerms]->start];
+        $relativeTermDates     += ['numberOfTerms'      => $numberOfTerms+1];
         if ($today > $termDates[$numberOfTerms]->end) {
             $relativeTermDates += ['term'               => null];
             $relativeTermDates += ['thisTermStartDate'  => null];

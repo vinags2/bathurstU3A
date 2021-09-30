@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Course;
+use App\Session;
 use App\Traits\Allowable;
+use App\Helpers\Utils;
 use Illuminate\Http\Request;
 
 class CourseController extends Controller
@@ -38,6 +40,9 @@ class CourseController extends Controller
     public function store(Request $request)
     {
         // check that course name is unique
+        if ($request->filled('new')) {
+            return back()->withInput();
+        }
         dd($request->input());
     }
 
