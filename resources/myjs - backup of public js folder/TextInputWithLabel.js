@@ -42,7 +42,7 @@ Vue.component('TextInputWithLabel',{
       <div class="row">
         <div class="col-1">
           <label>
-            {{label}}:
+            {{label}}
           </label>
         </div>
         <div class="col-4">

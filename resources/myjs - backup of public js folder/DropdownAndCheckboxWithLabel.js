@@ -58,7 +58,7 @@ Vue.component('DropdownAndCheckboxWithLabel',{
       <div class="row">
         <div class="col-1">
           <label>
-            {{label1}}:
+            {{label1}}
           </label>
         </div>
         <div class="col-4">
@@ -75,7 +75,7 @@ Vue.component('DropdownAndCheckboxWithLabel',{
             :title="title2"
           />
           <label :title="title2">
-            {{label2}}:
+            {{label2}}
           </label>
         </div>
       </div>`,

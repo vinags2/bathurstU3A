@@ -10,7 +10,7 @@ Vue.component('singleentry',{
         <table>
             <tr><td></td></tr>
             <tr>
-                <td><label class="col-xs-3 col-form-label mr-2" for="first_name_input">{{config}}:</label></td>
+                <td><label class="col-xs-3 col-form-label mr-2" for="first_name_input">{{config}}</label></td>
                 <td>
                     <input type="text" ref="toSearchFor" autofocus="autofocus" v-model="toSearchFor" size="40" id="toSearchFor_input" class="form-control" name="toSearchFor" value="" />
                 </td>

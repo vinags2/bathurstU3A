@@ -2,10 +2,13 @@
 
 @section('content')
 <script src="{{ asset('dist/utilities.js') }}"> </script>
-<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script> -->
-<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script> -->
+<script src = "{{ asset('js/vue.js') }}"></script>
+<script src = "{{ asset('js/lodash.min.js') }}"></script>
+<script src = "{{ asset('js/axios.min.js') }}"></script>
 <script src = "{{ asset('js/singleentry.js') }}"></script>
 <script src = "{{ asset('js/SingleEntryWithDbLookup.js') }}"></script>
 <script src = "{{ asset('js/subheading.js') }}"></script>
@@ -25,7 +28,7 @@
     @include('partials.commonUI.showSuccessOrErrors')
     @if (!$showDetails)
         <div id = "course">
-            <singleentry model="course" ajaxurl='{{ $searchUrl }}'></singleentry>
+            <singleentry model="course" ajaxurl='{{ $searchUrl }}' allownewmodels="true"></singleentry>
         </div>
         <script>
             var vm = new Vue({
@@ -43,11 +46,13 @@
                     name="course_name"
                     title="The name of the course. Long names will not print well."
                     value="{{ old('course_name',$course['name']) }}"
+                    :error={{ $errors->has('course_name') ? "true" : "false" }}
                     set-focus >
                 </text-input-with-label>
                 <text-area-with-label
                     title="A description of the course, for prospective class members. Keep the description to about 200 characters."
                     name="course_description"
+                    :error={{ $errors->has('course_description') ? "true" : "false" }}
                     value="{{ old('course_description',$course['description']) }}" >
                 </text-area-with-label>
                 <horizontal-inputs-with-labels
@@ -164,6 +169,7 @@
                     <text-input-with-label
                         name="{{ $nameName }}"
                         title="The name of this session. A course can be run several times a week. Each session must have a name. It can be the same as the course name."
+                        :error={{ $errors->has('sessionNames.'.$loop->index) ? "true" : "false" }}
                         value="{{ old($oldName, $session->name) }}">
                     </text-input-with-label>
                     <div >
@@ -172,7 +178,7 @@
                             ajax-url="{{ url('onelineclosenamesearch') }}"
                             nameid="{{ $facilitatorIdName }}"
                             namename="{{ $facilitatorNameName }}"
-                            :model-id-default="{{ old($oldFacilitatorId, $facilitator->id) }}" 
+                            :model-id-default="{{ old($oldFacilitatorId, $facilitator->id) ?? -1 }}" 
                             model-name-default="{{ old($oldFacilitatorName, $facilitator->name) }}" 
                             @if ($loop->index == 7)
                                 set-focus
@@ -206,16 +212,18 @@
                         name="{{ $descriptionName }}"
                         title="This description of the session is appended to the course description. Keep it brief."
                         value="{{ old($oldDescription, $session->description) }}"
+                        :error={{ $errors->has('sessionDescriptions.'.$loop->index) ? "true" : "false" }}
                         :max-length=100
-                        label="Description:">
+                        label="Description">
                     </text-input-with-label>
                     <horizontal-inputs-with-labels 
-                        label="Size:"
-                        label1="Min:"
+                        label="Size"
+                        label1="Min"
                         name1="{{ $minClassSizeName }}" 
                         value1="{{ old($oldMinClassSize,$session->minimum_session_size) }}"
                         title1="Minimum class size (0 or empty for no minimum)"
-                        label2="Max:"
+                        :error={{ $errors->has('sessionMinClassSizes.'.$loop->index) ? "true" : "false" }}
+                        label2="Max"
                         name2="{{ $maxClassSizeName }}" 
                         value2="{{ old($oldMaxClassSize,$session->maximum_session_size) }}"
                         title2="Maximum class size (0 or empty for no maximum)"
@@ -246,6 +254,7 @@
                         name1="{{ $startTimeName }}" 
                         value1="{{ old($oldStartTime,$session->start_time) }}"
                         title1="The time of the day that the class starts. Must be earlier than the end time."
+                        :error={{ $errors->has('sessionEndTimes.'.$loop->index) ? "true" : "false" }}
                         label2="To"
                         name2="{{ $endTimeName }}" 
                         value2="{{ old($oldEndTime,$session->end_time) }}"
@@ -254,7 +263,7 @@
                     </horizontal-inputs-with-labels>
                     <div class="row">
                         <div class="col-1 mr-3">
-                            Terms:
+                            Terms
                         </div>
                         @foreach ($defaultActiveTermsForTheSession as $key => $defaultActiveTerm)
                                 @php
@@ -313,6 +322,7 @@
                             label="Notes"
                             title="Notes. Not visible except by authorised users. Maximum of 100 characters."
                             name="{{ $commentName }}" 
+                            :error={{ $errors->has('sessionComments.'.$loop->index) ? "true" : "false" }}
                             :max-length=100
                             value="{{ old($oldComment,$session->comment) }}">
                         </text-input-with-label>
@@ -354,6 +364,7 @@
                     </div>
                     <input type="hidden" id="id" name="id" value="{{ old('id', $course['id']) }}"/>
                     <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
+                    <input type="hidden" id="numberOfTerms" name="numberOfTerms" value="{{ old('numberOfTerms', $numberOfTerms) }}"/>
                     <input type="hidden" id="state" value="{{ $state }}" name="state" />
                     <input type="hidden" :value="newSessions" name="numberOfNewSessions" />
                 </div>

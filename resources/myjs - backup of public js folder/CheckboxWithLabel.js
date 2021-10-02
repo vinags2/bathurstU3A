@@ -34,7 +34,7 @@ Vue.component('CheckboxWithLabel',{
       <div class="row">
         <div v-if="rightPlacement" :class="classForLabel">
           <label :title="title">
-            {{label}}:
+            {{label}}
           </label>
         </div>
         <div :class="classForCheckbox">
@@ -48,7 +48,7 @@ Vue.component('CheckboxWithLabel',{
         </div>
         <div v-if="leftPlacement" :class="classForLabel">
           <label>
-            {{label}}:
+            {{label}}
           </label>
         </div>
       </div>`,

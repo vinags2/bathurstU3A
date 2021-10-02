@@ -37,6 +37,7 @@ class EditCoursesComposer
         $this->getCourse();
         $this->getShowDetails();
         if ($this->showDetails) {
+            $this->getNumberOfNewSessions();
             $this->getSessions();
             $this->getNewSessions();
             $this->venues = $this->getLinkedModel([$this, "venueModel"], [$this,"venueId"]);
@@ -102,10 +103,10 @@ class EditCoursesComposer
      * Initialize the Course
      */
     private function getCourse() {
-        if ($this->state == 'course search') {
+        if (($this->state == 'course search') or ($this->state == 'new course')) {
             $this->course = new Course;
             $this->course->id = -1;
-            $this->course->name = ucfirst(strtolower(request()->input('course_name', null)));
+            $this->course->name = ucfirst(strtolower(request('toSearchFor')));
             $this->course->description = '';
             $this->course->comment = '';
             $this->suspended = 0;
@@ -115,15 +116,32 @@ class EditCoursesComposer
     }
 
     /**
+     * set the number of new sessions
+     * Equal to old(numberOfNewSessions) if it exists (from user clicking 'back)
+     * or 1 if from user clicking 'new sessions'
+     * or 1 if a new course
+     * or 0 otherwise
+     */
+    private function getNumberOfNewSessions() {
+        $this->numberOfNewSessions = old('numberOfNewSessions', -1);
+        if ($this->numberOfNewSessions == -1) {
+            if (request()->filled('new') or ($this->course->id == -1)) {
+                $this->numberOfNewSessions = 1;
+            } else {
+                $this->numberOfNewSessions = 0;
+            }
+        }
+    }
+
+    /**
      * get the sessions associated with the course
      * 
      * if a new course, set the number of new sessions to 1
      */
     private function getSessions() {
-        if (($this->state == 'course search') or ($this->course->id == -1)) {
+        if (($this->course->id == -1)) {
             $this->sessions = null;
             $this->numberOfSessions = 0;
-            $this->numberOfNewSessions = 1;
         } else {
             $this->sessions = $this->course->sessions()->get();
             $this->numberOfSessions = count($this->sessions);
@@ -140,7 +158,6 @@ class EditCoursesComposer
      * name = course name n where n = the number of the sessions
      */
     private function getNewSessions() {
-        $this->numberOfNewSessions = old('numberOfNewSessions', 0);
         for ($i=0; $i < $this->numberOfNewSessions; $i++) {
             $totalSessions = $this->numberOfSessions + $i;
             if ($totalSessions > 6) break;
@@ -180,11 +197,11 @@ class EditCoursesComposer
      * returns the data to be saved in $this->venues, etc.
      */
     private function getLinkedModel($thisLinkedModel, $newArrayItemId) {
-        if ($this->sessions) {
             $sessions = $this->sessions;
             $linkedModelVariable = [];
             $firstId = -1;
             $firstName = '';
+        if ($this->sessions) {
             foreach ($sessions as $key => $session) {
                 $thisModel = $thisLinkedModel($session)->first();
                 $thisModelName = $thisModel ? $thisModel->name : null;
@@ -194,12 +211,12 @@ class EditCoursesComposer
                     $firstName = $thisModelName;
                 }
             }
+        }
             for ($i=0; $i < $this->numberOfNewSessions; $i++) {
                 $totalSessions = $this->numberOfSessions + $i;
                 if ($totalSessions > 6) break;
                 $linkedModelVariable[$totalSessions] = (object)['id' => $firstId, 'name' => $firstName];
             }
-        }
         return $linkedModelVariable;
     }
 
@@ -248,7 +265,6 @@ class EditCoursesComposer
             'currentYear'                   => $this->currentYear,
             'url'                           => url()->current(),
             'searchUrl'                     => url('coursesearch'),
-            'allowNewModel'                 => true, // allow user to select a non-existing model/course
             'effectiveFrom'                 => Setting::effectiveFrom(),
             'paramKey'                      => 'name', // paramKey is passed in the url to the API eg ?name=bonsai
         ];

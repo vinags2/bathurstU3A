@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\UpdateByable;
 use App\Setting;
+use Carbon\Carbon;
 
 class Session extends Model
 {
@@ -93,6 +94,13 @@ class Session extends Model
     }
 
     /**
+     * output start and end times in the format H:i (2 digits for 24 hour and minutes)
+     */
+    // public function getStartTimeAttribute() {
+        // return (new DateTime($this->start_time))->format('H:i');
+    // }
+
+    /**
      * Return the roll component of roll_type 
      * [Note that the roll type is an integer, with 64 added if the rolls are 
      * to be printed with the contact details of the members]
@@ -123,6 +131,19 @@ class Session extends Model
         }
 
         return $terms;
+    }
+
+    /**
+     * Output start and end times as hour and minutes (that is, strip the seconds)
+     */
+    public function getStartTimeAttribute($value) {
+        return substr($value,0,5);
+        // return \Carbon\Carbon::createFromFormat('H:i:s', $value)->toTimeString();
+    }
+
+    public function getEndTimeAttribute($value) {
+        return substr($value,0,5);
+        // return \Carbon\Carbon::createFromFormat('H:i:s', $value)->toTimeString();
     }
 
     /**

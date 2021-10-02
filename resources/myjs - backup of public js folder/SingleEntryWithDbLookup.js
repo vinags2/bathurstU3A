@@ -43,7 +43,7 @@ Vue.component('SingleEntryWithDbLookup',{
    template: `<div>
             <div class="row">
               <div class="col-1">
-                  <label>{{config}}:</label>
+                  <label>{{config}}</label>
               </div>
               <div class="col-4">
                  <input

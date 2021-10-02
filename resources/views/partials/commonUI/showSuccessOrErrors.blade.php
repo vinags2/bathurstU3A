@@ -1,17 +1,16 @@
-@if (session('success'))
-    <div class="container">
-        <table id="successMessage" class="table-sm alert-success ml-5"><tr><td>
+<div class="container">
+    @if (session('success'))
+        <div class="row alert-success col-5">
             {{ session('success') }}
-        </td></tr><tr><td></td></tr></table>
-    </div>
-@elseif ($errors->any())
-    <div class="container">
-        <table class="table-sm alert-danger ml-5"><tr><td>
+        </div>
+    @elseif ($errors->any())
+        <div class="row alert-danger col-5">
             Please fix the errors below...
-        </td></tr><tr><td></td></tr>
-        @foreach (array_unique($errors->all()) as $error)
-            <tr class="alert-danger"><td>{{ $error }}</td></tr>
-        @endforeach
-    </table>
-    </div>
-@endif
+            <ul>
+                @foreach (array_unique($errors->all()) as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+</div>
