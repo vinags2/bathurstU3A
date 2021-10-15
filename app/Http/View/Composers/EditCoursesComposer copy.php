@@ -8,11 +8,6 @@ use App\Setting;
 use App\Session;
 use App\Helpers\Utils;
 
-/**
- * $this->numberOfSessions = number of existing sessions associated with the course, as currently stored in the database.
- * $this->numberOfNewSessions = number of new sessions that the user has selected, on top of $this->getNumberOfNewSessions
- * count($sessions) = $this->numberOfSessions + $this->numberOfNewSessions.
- */
 class EditCoursesComposer
 {
     private $state;
@@ -31,8 +26,6 @@ class EditCoursesComposer
     private $facilitators;
     private $alternate_facilitators;
     private $venues;
-    private $termValues;
-    private $allYearValues;
 
     public function __construct()
     {
@@ -52,7 +45,6 @@ class EditCoursesComposer
             $this->venues = $this->getLinkedModel([$this, "venueModel"], [$this,"venueId"]);
             $this->facilitators = $this->getLinkedModel([$this, "facilitatorModel"], [$this,"facilitatorId"]);
             $this->alternate_facilitators = $this->getLinkedModel([$this, "alternateFacilitatorModel"], [$this,"alternateFacilitatorId"]);
-            $this->getValues();
         }
     }
 
@@ -133,10 +125,14 @@ class EditCoursesComposer
      * or 0 otherwise
      */
     private function getNumberOfNewSessions() {
-        $this->numberOfNewSessions = old('numberOfNewSessions', 0);
-        if (old('new', false) or ($this->course->id == -1)) {
-            $this->numberOfNewSessions += 1;
-        } 
+        $this->numberOfNewSessions = old('numberOfNewSessions', -1);
+        if ($this->numberOfNewSessions == -1) {
+            if (request()->filled('new') or ($this->course->id == -1)) {
+                $this->numberOfNewSessions = 1;
+            } else {
+                $this->numberOfNewSessions = 0;
+            }
+        }
     }
 
     /**
@@ -263,22 +259,11 @@ class EditCoursesComposer
         return null;
     }
 
-    private function getValues() {
-        $sessionActiveTerms = old('sessionActiveTerms');
-        $sessionAllYearInstead = old('sessionAllYearInstead');
-        foreach ($this->activeTerms as $i => $activeTerm) {
-            $this->allYearValues[$i] = $sessionAllYearInstead[$i] ?? $this->allYearInsteadOfTerms[$i];
-            for ($j = 0; $j < $this->numberOfTerms; $j++) {
-                $this->termValues[$i][$j] = $sessionActiveTerms[$i][$j] ?? $this->activeTerms[$i][$j];
-            }
-        }
-
-    }
-
     /** Return the parameters to be passed to the View */
     private function getViewParameters() {
         $viewParameters = [
             'course'                        => $this->course,
+            'effectiveFromDate'             => $this->getEffectiveFromDate(),
             'effectiveFromOptions'          => Setting::effectiveFromOptions(),
             'showDetails'                   => $this->showDetails,
             'state'                         => $this->state,
@@ -294,13 +279,13 @@ class EditCoursesComposer
                 'sessions'                      => $this->sessions,
                 'numberOfSessions'              => $this->numberOfSessions,
                 'numberOfNewSessions'           => $this->numberOfNewSessions,
-                'numberOfTerms'                 => $this->numberOfTerms,
                 'facilitators'                  => $this->facilitators,
                 'alternate_facilitators'        => $this->alternate_facilitators,
                 'venues'                        => $this->venues,
                 'rollTypeOptions'               => $this->getRollTypeOptions(),
-                'termValues'                    => $this->termValues,
-                'allYearValues'                 => $this->allYearValues
+                'numberOfTerms'                 => $this->numberOfTerms,
+                'activeTerms'                   => $this->activeTerms,
+                'allYearInsteadOfTerms'         => $this->allYearInsteadOfTerms
             ];
         }
 

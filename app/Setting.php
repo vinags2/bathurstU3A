@@ -180,6 +180,45 @@ class Setting extends Model
         return 'nextTerm';
     }
 
+    /**
+     * return the date when the effectiveFrom date is set (for courses_histories and session_histories tables) , based on whether effectiveFrom is 'nextYear', 'nextTerm', or immediately
+     * 
+     * If 'effectiveFrom' = 'immediately'
+     *      - set the effectiveFrom date to start of this term, or the start of the next term, the start of next year
+     * otherwise
+     *      - set the effectiveFrom date to the start of next term, or the start of next year.
+     */
+    static public function effectiveFromDate($effectiveFrom) {
+        $relativeTermDates = Setting::termDatesComparedToToday();
+        $currentYear = Utils::currentYear();
+        $startOfNextyear = (new Carbon('first monday of January ' . ($currentYear + 1)))->toDateString();
+
+        if ($effectiveFrom == 'immediately') {
+            return $relativeTermDates->thisTermStartDate ?? $relativeTermDates->nextTermStartDate ?? $startOfNextyear;
+        }
+        return $relativeTermDates->nextTermStartDate ?? $startOfNextyear;
+    }
+
+    /**
+     * return the date when the effectiveTo date is set (for courses_histories and session_histories tables) , based on whether effectiveFrom is 'nextYear', 'nextTerm', or immediately
+     * 
+     * If 'effectiveFrom' = 'immediately'
+     *      - set the effectiveTo date to end of this term, or today
+     * otherwise
+     *      - set the effectiveTo date to the start of next term, or the start of next year.
+     */
+    static public function effectiveToDate($effectiveFrom) {
+        $relativeTermDates = Setting::termDatesComparedToToday();
+        $currentYear = Utils::currentYear();
+        $today = Utils::today();
+        $startOfNextyear = (new Carbon('first monday of January ' . ($currentYear + 1)))->toDateString();
+
+        if ($effectiveFrom == 'immediately') {
+            return $relativeTermDates->thisTermEndDate ?? $today;
+        }
+        return $relativeTermDates->nextTermStartDate ?? $startOfNextyear;
+    }
+
     static public function effectiveFromOptions($includeOther = false) {
         $lav = [];
         $lav[0] = (object) ['label' => 'next term', 'value' => 'nextTerm'];

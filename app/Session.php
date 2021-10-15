@@ -113,6 +113,9 @@ class Session extends Model
      * return the active terms as an array of terms with true/false
      * for example for a course not running in term 3, the output would be:
      * [true, true, false, true]
+     * 
+     * if all elements are zero, means that the course session runs the whole year (no term breaks)
+     * [the implication is that if the session is not running at all during the year, 'suspended' should be true]
      */
     public function getActiveTermsAsArrayAttribute() {
         $numberOfTerms = Setting::currentSetting()->number_of_terms;

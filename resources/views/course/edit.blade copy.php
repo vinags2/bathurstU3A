@@ -156,6 +156,8 @@
                     $commentName = 'sessionComments'.$loopIndex;
                     $oldComment = 'sessionComments'.$loopIndexInDotNotation;
 
+                    // Active terms
+                    $defaultActiveTermsForTheSession = $activeTerms[$loop->index];
                 @endphp
                     <input
                         type="hidden"
@@ -163,12 +165,12 @@
                         value="{{ $session->id }}"
                     />
                     <subheading
-                        subheading="Session {{ $loop->index+1 }}"  :width="5">
+                        subheading="Session {{ $loop->index+1 }}:"  :width="5">
                     </subheading>
                     <text-input-with-label
                         name="{{ $nameName }}"
                         title="The name of this session. A course can be run several times a week. Each session must have a name. It can be the same as the course name."
-                        :error={{ $errors->has($oldName) ? "true" : "false" }}
+                        :error={{ $errors->has('sessionNames.'.$loop->index) ? "true" : "false" }}
                         value="{{ old($oldName, $session->name) }}">
                     </text-input-with-label>
                     <div >
@@ -211,7 +213,7 @@
                         name="{{ $descriptionName }}"
                         title="This description of the session is appended to the course description. Keep it brief."
                         value="{{ old($oldDescription, $session->description) }}"
-                        :error={{ $errors->has($oldDescription) ? "true" : "false" }}
+                        :error={{ $errors->has('sessionDescriptions.'.$loop->index) ? "true" : "false" }}
                         :max-length=100
                         label="Description">
                     </text-input-with-label>
@@ -221,7 +223,7 @@
                         name1="{{ $minClassSizeName }}" 
                         value1="{{ old($oldMinClassSize,$session->minimum_session_size) }}"
                         title1="Minimum class size (0 or empty for no minimum)"
-                        :error={{ $errors->has($oldMinClassSize) ? "true" : "false" }}
+                        :error={{ $errors->has('sessionMinClassSizes.'.$loop->index) ? "true" : "false" }}
                         label2="Max"
                         name2="{{ $maxClassSizeName }}" 
                         value2="{{ old($oldMaxClassSize,$session->maximum_session_size) }}"
@@ -233,7 +235,7 @@
                             name="{{ $dayOfTheWeekName }}"
                             label="Held on"
                             title="On which day of the week does the session run?"
-                            selected-key="{{ old($oldDayOfTheWeek, $session->day_of_the_week)}}"
+                           selected-key="{{ old($oldDayOfTheWeek, $session->day_of_the_week)}}"
                         >
                         </dropdown-with-label>
                     </div>
@@ -253,7 +255,7 @@
                         name1="{{ $startTimeName }}" 
                         value1="{{ old($oldStartTime,$session->start_time) }}"
                         title1="The time of the day that the class starts. Must be earlier than the end time."
-                        :error={{ $errors->has($oldEndTime) ? "true" : "false" }}
+                        :error={{ $errors->has('sessionEndTimes.'.$loop->index) ? "true" : "false" }}
                         label2="To"
                         name2="{{ $endTimeName }}" 
                         value2="{{ old($oldEndTime,$session->end_time) }}"
@@ -267,9 +269,12 @@
                         <div class="col-1 mr-3" title="{{$title}}">
                             Terms
                         </div>
-                        @for  ($i = 0; $i < $numberOfTerms; $i++)
+                        @foreach ($defaultActiveTermsForTheSession as $key => $defaultActiveTerm)
                                 @php
-                                    $checkboxName = 'sessionActiveTerms['.($loop->index).']'.'['.($i).']';
+                                    $checkboxName = 'sessionActiveTerms['.($loop->parent->index).']'.'['.($loop->index).']';
+                                    $checkboxArray = 'sessionActiveTerms['.($loop->parent->index).']';
+                                    $userEnteredValue = 'sessionActiveTerms.'.($loop->parent->index).'.'.($loop->index);
+                                    $userEnteredActiveTermsForTheSession = 'sessionActiveTerms.'.$loop->parent->index;
                                 @endphp
                                 @if (($loop->index != 0) and ($loop->index % 4 == 0))
                                     </div>
@@ -280,25 +285,29 @@
                             <div>
                                 <input type="checkbox" class="mr-1" title="{{$title}}"
                                 name="{{$checkboxName}}"
-                                v-model="terms[{{$loop->index}}][{{$i}}]"
-                                @change="setallyear({{$loop->index}})"
+                                v-model="defaultterms[{{$loop->parent->index}}][{{$loop->index}}]"
+                                @change="setallyear({{$loop->parent->index}})"
                                 value=1
                                 />
                                 <label class="mr-3" title="{{$title}}">
                                     Term {{ $loop->index + 1 }}
                                 </label>
                             </div>
-                        @endfor
+                        @endforeach
                     </div>
                     @php
                         $checkboxAllYearName = 'sessionAllYearInstead['.($loop->index).']';
+                        $userEnteredAllYearValue = 'sessionAllYearInstead.'.($loop->index);
                     @endphp
                     <div class="row">
                         <div class="col-1 mr-3" title="{{$title}}"></div>
                         <div>
                             <input type="checkbox" class="mr-1" title="{{$title}}"
+                            @if ((is_array(old($userEnteredActiveTermsForTheSession)) ? old($userEnteredValue, 0) : $defaultActiveTerm) == 1)
+                                    checked
+                            @endif
                             name="{{$checkboxAllYearName}}"
-                            v-model="allyearinstead[{{$loop->index}}]"
+                            v-model="defaultallyearinstead[{{$loop->index}}]"
                             @change="setallyear({{$loop->index}}, true)"
                             value=1
                             />
@@ -340,14 +349,18 @@
                             label="Notes"
                             title="Notes. Not visible except by authorised users. Maximum of 100 characters."
                             name="{{ $commentName }}" 
-                            :error={{ $errors->has($oldComment) ? "true" : "false" }}
+                            :error={{ $errors->has('sessionComments.'.$loop->index) ? "true" : "false" }}
                             :max-length=100
                             value="{{ old($oldComment,$session->comment) }}">
                         </text-input-with-label>
                     </div>
                 </div>
                 @endforeach
+                @php
+                    $isOtherSelected=old('effective_from', $effectiveFrom) == 'other' ? "true" : "false"
+                @endphp
                 <div class="mt-3">
+                    <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
                     <subheading
                         subheading="Changes effective from" :width="5">
                     </subheading>
@@ -357,6 +370,14 @@
                         :labels-and-values="{{$effectiveFromOptions}}"
                         checked-value="{{ old('effective_from', $effectiveFrom) }}">
                     </horizontal-radio-buttons-with-labels>
+                    <radio-button-with-date-input
+                        name="effective_from"
+                        label="other"
+                        value="other"
+                        title="When do your changes take effect? Next term or next year maybe? If other, select the date for when they take effect."
+                        date-value="{{ old('effective_from_date',date('Y-m-d', strtotime($effectiveFromDate))) }}"
+                        :is-checked="{{ $isOtherSelected }}">
+                    </radio-button-with-date-input>
                     <div class="row mt-3">
                         <div>
                             <button type="submit" name="save" class="btn btn-primary btn-sm" value="true">Save</button>
@@ -365,17 +386,25 @@
                             <button type="submit" name="cancel" class="btn btn-primary btn-sm" value="true">Cancel</button>
                         </div>
                         <div class="ml-2">
-                            <button type="submit" name="new" class="btn btn-primary btn-sm" value="true">New session</button>
+                            <button type="submit" name="new" class="btn btn-primary btn-sm" @click="incrementNewSessions()" value="true">New session</button>
                         </div>
                     </div>
                     <input type="hidden" id="id" name="id" value="{{ old('id', $course['id']) }}"/>
-                    <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ $numberOfSessions }}"/>
-                    <input type="hidden" :value="newSessions" name="numberOfNewSessions" />
+                    <input type="hidden" id="numberOfSessions" name="numberOfSessions" value="{{ old('numberOfSessions', $numberOfSessions) }}"/>
                     <input type="hidden" id="numberOfTerms" name="numberOfTerms" :value="numberOfTerms"/>
                     <input type="hidden" id="state" value="{{ $state }}" name="state" />
+                    <input type="hidden" :value="newSessions" name="numberOfNewSessions" />
                 </div>
             </div>
         </form>
+         @php
+          dd(
+              'userterms = ', json_encode(old('sessionActiveTerms')),
+              'defaultterms = ', json_encode($activeTerms),
+              'userallyearinstead = ', json_encode(old('sessionAllYearInstead')),
+              'defaultallyearinstead = ', json_encode($allYearInsteadOfTerms)
+            )
+           @endphp
         <script>
             var app2 = new Vue({
             el: '#details',
@@ -383,34 +412,47 @@
                 newSessions: 0,
                 totalNumberOfSessions: {{ count($sessions) }},
                 numberOfTerms: 0,
-                terms: {{ json_encode($termValues) }},
-                allyearinstead: {{ json_encode($allYearValues) }},
+                defaultterms: {{ json_encode($activeTerms) }},
+                userterms: {{ json_encode(old('sessionActiveTerms')) }}, 
+                defaultallyearinstead: {{ json_encode($allYearInsteadOfTerms) }},
+                userallyearinstead: {{ json_encode(old('sessionAllYearInstead')) }}
             },
             created: function () {
                 this.newSessions = {{ $numberOfNewSessions }},
-                this.numberOfTerms = {{ $numberOfTerms }},
+                this.numberOfTerms = {{ old('numberOfTerms', $numberOfTerms) }},
                 this.initTerms()
             },
             methods: {
+                incrementNewSessions: function() {
+                    this.newSessions += 1
+                },
                 setallyear: function(session, isallyear = false) {
                   if (isallyear) {
-                    if (this.allyearinstead[session]) {
+                    if (this.defaultallyearinstead[session]) {
                       this.setcheckboxes(session);
                     } else {
                       this.setcheckboxes(session,true);
                     }
                   } else {
-                    this.allyearinstead[session] = this.notermsselected(session);
+                    this.defaultallyearinstead[session] = this.notermsselected(session);
                   }
                 },
                 setcheckboxes(session, torf = false) {
-                  this.terms[session].forEach((i,key) => {
-                    this.terms[session][key] = torf;
+                  this.defaultterms[session].forEach((i,key) => {
+                    this.defaultterms[session][key] = torf;
                   });
                 },
                 notermsselected(session) {
-                    const found = this.terms[session].find(element => element == 1);
+                    const found = this.defaultterms[session].find(element => element == 1);
                     return !found;
+                },
+                initTerms() {
+                    for (i=0; i < this.totalNumberOfSessions; i++) {
+                        this.defaultallyearinstead[i] = this.userallyearinstead ? this.userallyearinstead[i] : this.defaultallyearinstead[i];
+                        for (j=0; j < this.numberOfTerms; j++) {
+                            this.defaultterms[i][j] = this.userterms[i] ? this.userterms[i][j] : this.defaultterms[i][j];
+                        }
+                    }
                 }
             }
             })

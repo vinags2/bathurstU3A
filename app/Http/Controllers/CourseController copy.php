@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Course;
-use App\Course_history;
 use App\Session;
-use App\Session_history;
-use App\Setting;
 use App\Traits\Allowable;
 use App\Helpers\Utils;
 use Illuminate\Http\Request;
@@ -90,10 +87,15 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
+        // 2. firstly delete the sessions marked 'deleted'
+        //      then to the validation with rules like ['venues.*.name' => 'required']
+        // 3. don't forget that venues and facilitators may be null...they will be printed as 'to be confirmed'
+
+        // ********* Allow for courses which run the whole year, and don't follow the terms ********* ??
         /**
          * Savimg routine:
          * 
-         * 1. get the effective_from date and the effective_to date
+         * 1. get the effective_from date
          * 2. handle deleted course, deleting sessions as well, and completing effective_to date
          * 3. if course changed:
          *      a. save course to courses table
@@ -102,6 +104,11 @@ class CourseController extends Controller
          *      a. if deleted, delete from sessions table, and complete effective_to date in session_histories table
          *      b. updateorcreate entry in session_histories table with the effective_from date
          *
+         * If course deleted
+         *      - delete course from courses table
+         *      - set the effective_to of the latest course record in course_histories to the effective_from of the form
+         *      - delete the sessions from the sessions table
+         *      - set the effective_to of the latest sessions record in session_histories to the effective_from of the form
          *  Update (if existing) or create (if new course) the latest course record in the courses table
          *  If today is later than the effective_from date in the course_histories table for the latest course record, then create a new record
          *  Otherwise update the latest record.
@@ -125,24 +132,14 @@ class CourseController extends Controller
          * 
          *  [What do I do if user makes changes for this year, but has already made changes for next year?]
          *          - let this happen, but won't be visible in the current version, but will be used for historical purposes
-         * 
-         *  If the session runs all year, set the session->terms to one term which starts on the first day of the normal term 1,
-         *          and ends on the last day of the normal last term of the year.
-         * 
-         *  [Note that 'all year' sessions will have their 'terms' field set to one term for the whole year]
          */ 
 
-        if ($request->filled('course_deleted')) {
-            $courseName = $request->course_name;
-            $this->destroy($request);
-            return redirect()->route('course.edit')->with('success', $courseName.' has been deleted successfully');
-        }
+        // dd($request->input());
         $request = $this->massageRequestData($request);
         if ($request->filled('new')) {
             return back()->withInput();
         }
-        $validatedData = $request->validate($this->rules, $this->messages);
-        return view('welcome');
+        $validatedData      = $request->validate($this->rules, $this->messages);
     }
 
     // Convert any 0 values in Class Sizes to nulls, so that the validation rules will work
@@ -150,8 +147,7 @@ class CourseController extends Controller
         $newRequestData = $this->massageClassSizes($request);
         $request->merge($newRequestData);
         $newRequestData = $this->massageTermCheckBoxes($request);
-        $request->merge($newRequestData[0]);
-        $request->merge($newRequestData[1]);
+        $request->merge($newRequestData);
         $newRequestData = $this->massageAllYearCheckBoxes($request);
         $request->merge($newRequestData);
         return $request;
@@ -169,21 +165,19 @@ class CourseController extends Controller
         return $t;
     }
 
-    // Fill any unclicked term and allyear checkboxes with a 0 value
+    // Fill any unclicked term checkboxes with a 0 value
     private function massageTermCheckBoxes($request) {
         $totalNumberOfSessions = $request->numberOfSessions + $request->numberOfNewSessions;
         $numberOfTerms = $request->numberOfTerms;
         $activeTerms = $request->sessionActiveTerms;
-        $allYearInstead = $request->sessionAllYearInstead;
         for ($i=0; $i<$totalNumberOfSessions; $i++) {
             for ($j=0; $j<$numberOfTerms; $j++) {
-                if (isset($activeTerms[$i]) or isset($allYearInstead[$i])) {
+                if (isset($activeTerms[$i])) {
                     $t['sessionActiveTerms'][$i][$j] = isset($activeTerms[$i][$j]) ? intval($activeTerms[$i][$j]) : 0;
-                    $u['sessionAllYearInstead'][$i] = isset($allYearInstead[$i]) ? intval($allYearInstead[$i]) : 0;
                 }
             }
         }
-        return [$t,$u];
+        return $t;
     }
 
     // Fill any unclicked allyear checkboxes with a 0 value
@@ -235,44 +229,14 @@ class CourseController extends Controller
     }
 
     /**
-     * Remove the Course and associated Sessions from the course, session, course_histories and session_histories tables
+     * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     * 
-     *  - set the effective_to of the latest course record in course_histories to the effectiveTo from Sessions::effectiveToDate, and check that effectiveTo >= effectiveFrom
-     *  - delete course from courses table
-     *  - set the effective_to of the latest sessions record in session_histories to that of the effectiveTo of the courses_histories table
-     *  - delete the sessions from the sessions table
-     * 
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        $courseId = $request->id;
-        $sessionIds = collect($request->sessionIds);
-        $effectiveToDate = Setting::effectiveToDate($request->effective_from);
-        $this->destroySessions($sessionIds, $effectiveToDate);
-        $this->destroyCourse($courseId, $effectiveToDate);
-    }
-
-    private function destroyCourse($id, $effectiveToDate) {
-        $course = Course_history::
-            where(['course_id' => $id, 'effective_to' => null])->first();
-        $course->effective_to = $effectiveToDate;
-        $course->save();
-        $course = Course::find($id);
-        $course->delete();
-    }
-
-    private function destroySessions($sessionIds, $effectiveToDate) {
-        foreach ($sessionIds as $sessionId) {
-            $session = Session_history::
-                where(['session_id' => $sessionId, 'effective_to' => null])->first();
-            $session->effective_to = $effectiveToDate;
-            $session->save();
-            $session = Session::find($sessionId);
-            $session->delete();
-        }
+        //
     }
 
     /**
