@@ -93,59 +93,49 @@ class CourseController extends Controller
         /**
          * Savimg routine:
          * 
-         * 1. get the effective_from date and the effective_to date
-         * 2. handle deleted course, deleting sessions as well, and completing effective_to date
+         * 1. If course deleted, delete the course and all related sessions in the courses and sessions tables.
+         *      Set the effective_to dates in the histories tables.
+         * 
          * 3. if course changed:
-         *      a. save course to courses table
-         *      b. updateorcreate entry in course_histories table with the effective_from date
+         *      a. save course to courses table (using updateOrCreate -- course_id and course_name must be unique)
+         *      b. updateorcreate entry in course_histories table with the effective_from date (course_id, effective_from date must be unique).
+         *          Set effective_to to null.
          * 4. For each session:
          *      a. if deleted, delete from sessions table, and complete effective_to date in session_histories table
-         *      b. updateorcreate entry in session_histories table with the effective_from date
+         *      b. updateorcreate entry in session_histories table with the effective_from date (session_id, effective_from date must be unique).
+         *          Set effective_to to null.
          *
-         *  Update (if existing) or create (if new course) the latest course record in the courses table
-         *  If today is later than the effective_from date in the course_histories table for the latest course record, then create a new record
-         *  Otherwise update the latest record.
-         *  Same for the Sessions and session_histories tables
-         *  Think about the following situations:
-         *      - mid term and effective_date in the form is immediately, or other's date is before end of term
-         *  
-         * Effective_from as from user form
-         *  [Treat 1 Jan as first day of term 1]
-         *      If user selects next term:
-         *          if today is after the first day of the last term of year, effective_from = 1 Jan of next year
-         *          otherwise effective_from = first day of next term
-         *      if user select next year:
-         *          if today is before day 1 of term 1, effective_from = 1 Jan of current year
-         *          otherwise, effective_from = 1 Jan of next year
-         *      if user select immediately:
-         *          if today is before end of term 1, set effective_from = 1 Jan of current year
-         *          if today is during another term,set effective_from = first day of current term
-         *          if today is between terms, effective_from = first day of the next term
-         *          if today is after the end of the last day of the last term, effective_from = 1 Jan of next year. 
-         * 
-         *  [What do I do if user makes changes for this year, but has already made changes for next year?]
-         *          - let this happen, but won't be visible in the current version, but will be used for historical purposes
-         * 
          *  If the session runs all year, set the session->terms to one term which starts on the first day of the normal term 1,
          *          and ends on the last day of the normal last term of the year.
          * 
-         *  [Note that 'all year' sessions will have their 'terms' field set to one term for the whole year]
          */ 
 
-        if ($request->filled('course_deleted')) {
-            $courseName = $request->course_name;
-            $this->destroy($request);
-            return redirect()->route('course.edit')->with('success', $courseName.' has been deleted successfully');
-        }
+        $courseName = $request->course_name;
+
+        // If user selected 'new session', add a new session
         $request = $this->massageRequestData($request);
         if ($request->filled('new')) {
             return back()->withInput();
         }
+
+         // If user selects 'Delete course', delete course
+        if ($request->filled('course_deleted')) {
+            $this->destroy($request);
+            return redirect()->route('course.edit')->with('success', $courseName.' has been deleted successfully');
+        }
+
         $validatedData = $request->validate($this->rules, $this->messages);
-        return view('welcome');
+
+        // Save course details if there are changes
+        $this->storeCourse($request, $validatedData);
+
+        // Save sessions including deleted sessions if requested
+        $this->storeSessions($request, $validatedData);
+
+        return redirect()->route('course.edit')->with('success', $courseName.' changes have been saved successfully');
     }
 
-    // Convert any 0 values in Class Sizes to nulls, so that the validation rules will work
+    // Ensure the data is uniform and consistent in the Request variable.
     private function massageRequestData($request) {
         $newRequestData = $this->massageClassSizes($request);
         $request->merge($newRequestData);
@@ -169,7 +159,7 @@ class CourseController extends Controller
         return $t;
     }
 
-    // Fill any unclicked term and allyear checkboxes with a 0 value
+    // Fill any unclicked term checkboxes with a 0 value
     private function massageTermCheckBoxes($request) {
         $totalNumberOfSessions = $request->numberOfSessions + $request->numberOfNewSessions;
         $numberOfTerms = $request->numberOfTerms;
@@ -198,6 +188,21 @@ class CourseController extends Controller
             }
         }
         return $t;
+    }
+
+    /**
+     * save the Course data if there are changes
+     */
+    private function storeCourse($request, $validatedData) {
+
+    }
+
+    /**
+     * save the Session data if there are changes
+     * including deleting sessions if requested
+     */
+    private function storeSessions($request, $validatedData) {
+
     }
 
     /**

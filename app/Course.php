@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Sanitizable;
 use App\Traits\UpdateByable;
 
 class Course extends Model
@@ -11,6 +12,18 @@ class Course extends Model
     use SoftDeletes;
     use UpdateByable;
     //
+
+    /**
+     * updateOrCreate, with sanitization of the data
+     */
+    static public function myUpdateOrCreate(array $searchData, array $extraData) {
+        $searchData = static::trimSanitize($searchData);
+        $extraData  = static::trimSanitize($extraData);
+        // dd($searchData, $extraData);
+        $course = Course::updateOrCreate($searchData, $extraData);
+        // now update course_histories
+        return $course;
+    }
 
     /**
      * Get the person who updated the record
